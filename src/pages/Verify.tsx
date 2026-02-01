@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { Mail, ArrowRight } from 'lucide-react';
 
 export default function Verify() {
-  const navigate = useNavigate();
   const location = useLocation();
   const formRef = useRef<HTMLDivElement>(null);
   const [email] = useState(location.state?.email || 'tu correo');
