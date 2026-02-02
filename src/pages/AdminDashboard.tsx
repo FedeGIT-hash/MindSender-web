@@ -32,7 +32,6 @@ export default function AdminDashboard() {
     completedTasks: 0,
     recentLogins: [] as LoginLog[]
   });
-  const [loading, setLoading] = useState(true);
 
   const isDev = user?.user_metadata?.role === 'admin';
 
@@ -44,8 +43,6 @@ export default function AdminDashboard() {
 
   const fetchAdminStats = async () => {
     try {
-      setLoading(true);
-      
       const { count: taskCount } = await supabase
         .from('tasks')
         .select('*', { count: 'exact', head: true });
@@ -69,8 +66,6 @@ export default function AdminDashboard() {
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
