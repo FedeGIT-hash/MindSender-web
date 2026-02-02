@@ -18,7 +18,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2 } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import { useTheme } from '../context/ThemeContext';
 
@@ -40,11 +40,12 @@ export default function Dashboard() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [notifications] = useState([
     { id: 1, title: 'Bienvenido', message: 'Gracias por usar MindSender Beta. ¡Disfruta organizando!', type: 'info', time: 'Ahora' },
     { id: 2, title: 'Sistema Actualizado', message: 'Hemos añadido modo oscuro y mejoras visuales.', type: 'system', time: 'Hace 5m' }
   ]);
-  const [newTask, setNewTask] = useState({ subject: '', description: '' });
+  const [newTask, setNewTask] = useState({ subject: '', description: '', due_time: '12:00' });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -198,6 +199,23 @@ export default function Dashboard() {
 
   const onDateClick = (date: Date) => {
     setSelectedDate(date);
+    setEditingTask(null);
+    setNewTask({ subject: '', description: '', due_time: '12:00' });
+    openModal();
+  };
+
+  const handleEditTask = (task: Task, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingTask(task);
+    setSelectedDate(new Date(task.due_date));
+    const taskDate = new Date(task.due_date);
+    const hours = taskDate.getHours().toString().padStart(2, '0');
+    const minutes = taskDate.getMinutes().toString().padStart(2, '0');
+    setNewTask({ 
+      subject: task.subject, 
+      description: task.description, 
+      due_time: `${hours}:${minutes}` 
+    });
     openModal();
   };
 
@@ -229,7 +247,11 @@ export default function Dashboard() {
         y: 10,
         duration: 0.2, 
         ease: 'power2.in',
-        onComplete: () => setIsModalOpen(false)
+        onComplete: () => {
+          setIsModalOpen(false);
+          setEditingTask(null);
+          setNewTask({ subject: '', description: '', due_time: '12:00' });
+        }
       });
       gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, delay: 0.1 });
     }
@@ -336,31 +358,70 @@ export default function Dashboard() {
     
     setLoading(true);
     
-    const dueDate = setMinutes(setHours(selectedDate, 12), 0);
+    const [hours, minutes] = newTask.due_time.split(':').map(Number);
+    const dueDate = setMinutes(setHours(selectedDate, hours), minutes);
 
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert([
-          {
-            user_id: user.id,
+      if (editingTask) {
+        const { data, error } = await supabase
+          .from('tasks')
+          .update({
             subject: newTask.subject,
             description: newTask.description,
             due_date: dueDate.toISOString(),
-            is_completed: false
-          }
-        ])
-        .select();
+          })
+          .eq('id', editingTask.id)
+          .select();
+
+        if (error) throw error;
+        if (data) {
+          setTasks(tasks.map(t => t.id === editingTask.id ? data[0] : t));
+        }
+      } else {
+        const { data, error } = await supabase
+          .from('tasks')
+          .insert([
+            {
+              user_id: user.id,
+              subject: newTask.subject,
+              description: newTask.description,
+              due_date: dueDate.toISOString(),
+              is_completed: false
+            }
+          ])
+          .select();
+
+        if (error) throw error;
+        if (data) {
+          setTasks([...tasks, data[0]]);
+        }
+      }
+
+      setNewTask({ subject: '', description: '', due_time: '12:00' });
+      closeModal();
+    } catch (error) {
+      console.error('Error handling task:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    if (!editingTask) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', editingTask.id);
 
       if (error) throw error;
-
-      if (data) {
-        setTasks([...tasks, data[0]]);
-        setNewTask({ subject: '', description: '' });
-        closeModal();
-      }
+      
+      setTasks(tasks.filter(t => t.id !== editingTask.id));
+      closeModal();
     } catch (error) {
-      console.error('Error adding task:', error);
+      console.error('Error deleting task:', error);
     } finally {
       setLoading(false);
     }
@@ -475,15 +536,21 @@ export default function Dashboard() {
                       {dayTasks.slice(0, 2).map((task) => (
                         <div 
                           key={task.id}
-                          onClick={(e) => handleToggleComplete(e, task)}
-                          className={`text-[8px] sm:text-[10px] p-1 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-200 flex items-center gap-1 sm:gap-2 group/task ${
+                          onClick={(e) => handleEditTask(task, e)}
+                          className={`text-[8px] sm:text-[10px] p-1 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-200 flex flex-col gap-0.5 group/task ${
                             task.is_completed 
                               ? 'bg-gray-100/50 dark:bg-gray-700/30 border-transparent text-gray-400 line-through' 
-                              : 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-[1.02]'
+                              : 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-[1.02] shadow-sm'
                           }`}
                         >
-                          {task.is_completed ? <CheckCircle2 size={10} className="sm:w-3 sm:h-3" /> : <Circle size={10} className="sm:w-3 sm:h-3 group-hover/task:scale-110 transition-transform" />}
-                          <span className="truncate">{task.subject}</span>
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            {task.is_completed ? <CheckCircle2 size={10} className="sm:w-3 sm:h-3" /> : <Circle size={10} className="sm:w-3 sm:h-3 group-hover/task:scale-110 transition-transform" />}
+                            <span className="truncate">{task.subject}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-[7px] sm:text-[8px] opacity-70">
+                            <Clock size={8} className="sm:w-2.5 sm:h-2.5" />
+                            <span>{format(new Date(task.due_date), 'HH:mm')}</span>
+                          </div>
                         </div>
                       ))}
                       {dayTasks.length > 2 && (
@@ -872,10 +939,10 @@ export default function Dashboard() {
 
             <div className="mb-6 sm:mb-8">
               <span className="inline-block px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase mb-3 sm:mb-4 border border-emerald-200 dark:border-emerald-800">
-                Nueva Entrada
+                {editingTask ? 'Editar Actividad' : 'Nueva Entrada'}
               </span>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                Crear Tarea
+                {editingTask ? 'Modificar Tarea' : 'Crear Tarea'}
               </h3>
               <p className="text-sm sm:text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2 font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
@@ -901,6 +968,55 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Hora de Entrega</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Clock className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                    </div>
+                    <input
+                      type="time"
+                      required
+                      className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium text-sm sm:text-base"
+                      value={newTask.due_time}
+                      onChange={(e) => setNewTask({ ...newTask, due_time: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {editingTask && (
+                  <div className="space-y-2">
+                    <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Estado</label>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleToggleComplete(e as any, editingTask);
+                        closeModal();
+                      }}
+                      className={`flex items-center gap-3 w-full px-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 font-bold text-sm sm:text-base ${
+                        editingTask.is_completed 
+                          ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400' 
+                          : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      {editingTask.is_completed ? (
+                        <>
+                          <CheckCircle2 size={20} className="text-emerald-500" />
+                          <span>Completada</span>
+                        </>
+                      ) : (
+                        <>
+                          <Circle size={20} />
+                          <span>Pendiente</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Descripción</label>
                 <div className="relative group">
@@ -918,28 +1034,40 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="flex gap-3 sm:gap-4 pt-2 sm:pt-4">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 text-sm sm:text-base"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm sm:text-base"
-                >
-                  {loading ? (
-                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <span>Guardar</span>
-                      <ChevronRight size={18} />
-                    </>
-                  )}
-                </button>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
+                {editingTask && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteTask}
+                    className="flex items-center justify-center gap-2 px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-200 text-sm sm:text-base border border-red-100 dark:border-red-900/30"
+                  >
+                    <Trash2 size={18} />
+                    <span>Eliminar</span>
+                  </button>
+                )}
+                <div className="flex flex-1 gap-3 sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 text-sm sm:text-base"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm sm:text-base"
+                  >
+                    {loading ? (
+                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>{editingTask ? 'Actualizar' : 'Guardar'}</span>
+                        <ChevronRight size={18} />
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
