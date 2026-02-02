@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot, AlertCircle } from 'lucide-react';
 import gsap from 'gsap';
-import { chatSession, hasGeminiKey } from '../../lib/gemini';
+import { openai, hasOpenAIKey, SYSTEM_INSTRUCTION } from '../../lib/openai';
 
 interface SenderAIProps {
   isOpen: boolean;
@@ -20,9 +20,9 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     {
       id: 'welcome',
       role: 'assistant',
-      content: hasGeminiKey 
+      content: hasOpenAIKey 
         ? 'Hola, soy Sender AI (delta 1.0). ¿En qué puedo ayudarte hoy a organizar tus tareas?'
-        : 'Hola. Para que pueda funcionar, necesito que configures mi "cerebro" (API Key de Gemini). Por favor agrega VITE_GEMINI_API_KEY a tus variables de entorno.',
+        : 'Hola. Para que pueda funcionar, necesito que configures mi "cerebro" (API Key de OpenAI). Por favor agrega VITE_OPENAI_API_KEY a tus variables de entorno.',
       timestamp: new Date()
     }
   ]);
@@ -59,8 +59,8 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     e.preventDefault();
     if (!input.trim() || isTyping) return;
     
-    if (!hasGeminiKey) {
-      setError('Falta la API Key de Gemini. Revisa la configuración.');
+    if (!hasOpenAIKey) {
+      setError('Falta la API Key de OpenAI. Revisa la configuración.');
       return;
     }
 
@@ -71,30 +71,43 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsTyping(true);
     setError(null);
 
     try {
-      if (chatSession) {
-        const result = await chatSession.sendMessage(userMessage.content);
-        const response = await result.response;
-        const text = response.text();
+      if (openai) {
+        // Convert internal message format to OpenAI message format
+        const apiMessages = newMessages.map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content
+        }));
+
+        const completion = await openai.chat.completions.create({
+          messages: [
+            { role: "system", content: SYSTEM_INSTRUCTION },
+            ...apiMessages
+          ],
+          model: "gpt-3.5-turbo",
+        });
+
+        const aiResponse = completion.choices[0]?.message?.content || "Lo siento, no pude generar una respuesta.";
         
         const aiMessage: AIMessage = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: text,
+          content: aiResponse,
           timestamp: new Date()
         };
 
         setMessages(prev => [...prev, aiMessage]);
       } else {
-        throw new Error("No se pudo iniciar la sesión de chat");
+        throw new Error("No se pudo iniciar el cliente OpenAI");
       }
     } catch (err) {
-      console.error('Error al conectar con Gemini:', err);
+      console.error('Error al conectar con OpenAI:', err);
       setError('Lo siento, tuve un problema al procesar tu mensaje. Intenta de nuevo.');
       
       const errorMessage: AIMessage = {
