@@ -689,7 +689,7 @@ export default function Dashboard() {
                       
                       {/* Overlay for edit */}
                       <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                        <Camera className="text-white drop-shadow-md transform scale-90 group-hover:scale-100 transition-transform" size={24} className="sm:w-8 sm:h-8" />
+                        <Camera className="text-white drop-shadow-md transform scale-90 group-hover:scale-100 transition-transform sm:w-8 sm:h-8" size={24} />
                       </div>
 
                       {/* Loading indicator */}
