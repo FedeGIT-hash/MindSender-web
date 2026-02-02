@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot } from 'lucide-react';
 import gsap from 'gsap';
 import { groq, hasGroqKey, MIND_SENDER_TOOLS } from '../../lib/groq';
@@ -15,10 +15,10 @@ interface SenderAIProps {
 interface AIMessage {
   id: string;
   role: 'user' | 'assistant' | 'system' | 'tool';
-  content: string;
+  content: string | null;
   timestamp: Date;
   tool_call_id?: string;
-  name?: string;
+  tool_calls?: any[];
 }
 
 export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProps) {
@@ -137,7 +137,7 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
       timestamp: new Date()
     };
 
-    let currentMessages = [...messages, userMessage];
+    const currentMessages = [...messages, userMessage];
     setMessages(currentMessages);
     setInput('');
     setIsTyping(true);
@@ -147,13 +147,13 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
       if (groq) {
         const fullSystemPrompt = `${SYSTEM_PROMPT}\nFecha y hora actual: ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}.`;
         
-        let apiMessages = [
+        const apiMessages = [
           { role: "system", content: fullSystemPrompt },
           ...currentMessages.map(msg => ({
             role: msg.role === 'assistant' ? 'assistant' : msg.role === 'user' ? 'user' : msg.role,
             content: msg.content,
             ...(msg.tool_call_id && { tool_call_id: msg.tool_call_id }),
-            ...(msg.name && { name: msg.name })
+            ...(msg.tool_calls && { tool_calls: msg.tool_calls })
           }))
         ];
 
@@ -167,40 +167,30 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
         const responseMessage = response.choices[0].message;
 
         if (responseMessage.tool_calls) {
-          const aiMessageWithToolCalls: AIMessage = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: responseMessage.content || "",
-            timestamp: new Date(),
-            tool_call_id: undefined // OpenAI/Groq spec: the message with tool_calls doesn't have a tool_call_id itself
-          };
-          
-          // Groq/OpenAI need the assistant message with tool_calls in the history
-          // We need to store the tool_calls for the next API call
-          const apiMessageWithToolCalls = {
-            role: 'assistant',
-            content: responseMessage.content,
-            tool_calls: responseMessage.tool_calls
-          };
-
           const toolResults = [];
-          if (responseMessage.tool_calls) {
-            for (const toolCall of responseMessage.tool_calls) {
-              const result = await handleToolCall(toolCall);
-              toolResults.push({
-                role: 'tool' as const,
-                tool_call_id: toolCall.id,
-                content: result
-              });
-            }
+          for (const toolCall of responseMessage.tool_calls) {
+            const result = await handleToolCall(toolCall);
+            toolResults.push({
+              role: 'tool' as const,
+              tool_call_id: toolCall.id,
+              content: result
+            });
           }
 
           // Now call the AI again with the tool results
           const secondResponse = await groq.chat.completions.create({
             messages: [
               { role: "system", content: fullSystemPrompt },
-              ...currentMessages.map(msg => ({ role: msg.role, content: msg.content })),
-              apiMessageWithToolCalls,
+              ...currentMessages.map(msg => ({ 
+                role: msg.role === 'assistant' ? 'assistant' : msg.role === 'user' ? 'user' : msg.role, 
+                content: msg.content,
+                ...(msg.tool_call_id && { tool_call_id: msg.tool_call_id })
+              })),
+              {
+                role: 'assistant',
+                content: responseMessage.content || null,
+                tool_calls: responseMessage.tool_calls
+              },
               ...toolResults
             ] as any,
             model: "llama-3.1-8b-instant"

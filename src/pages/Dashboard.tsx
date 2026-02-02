@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import TextType from '../components/TextType';
 import { supabase } from '../lib/supabase';
@@ -80,7 +80,7 @@ export default function Dashboard() {
     if (user?.user_metadata) {
       setUserName(user.user_metadata.full_name || user.email?.split('@')[0] || 'Usuario');
       setAvatarUrl(user.user_metadata.avatar_url || null);
-      setIsDev(user.user_metadata.role === 'admin'); // Mark as Dev if admin
+      setIsDev(user.user_metadata.role === 'admin'); 
     }
     
     if (user) {

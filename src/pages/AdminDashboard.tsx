@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { 
@@ -10,7 +10,7 @@ import {
   ShieldAlert,
   Server,
   Database,
-  BarChart3,
+  BarChart,
   Calendar as CalendarIcon,
   Terminal
 } from 'lucide-react';
@@ -18,13 +18,19 @@ import { Link, Navigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+interface LoginLog {
+  email: string | undefined;
+  last_sign_in: string | undefined;
+  role: string;
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalTasks: 0,
     completedTasks: 0,
-    recentLogins: [] as any[]
+    recentLogins: [] as LoginLog[]
   });
   const [loading, setLoading] = useState(true);
 
@@ -40,8 +46,6 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // En una app real, esto requeriría una tabla de perfiles/usuarios
-      // Por ahora simulamos algunas estadísticas basadas en lo que tenemos acceso
       const { count: taskCount } = await supabase
         .from('tasks')
         .select('*', { count: 'exact', head: true });
@@ -51,14 +55,16 @@ export default function AdminDashboard() {
         .select('*', { count: 'exact', head: true })
         .eq('is_completed', true);
 
-      // Aquí podrías añadir más consultas administrativas si tienes permisos
-      
       setStats({
-        totalUsers: 1, // Por ahora solo tú
+        totalUsers: 1, 
         totalTasks: taskCount || 0,
         completedTasks: completedCount || 0,
         recentLogins: [
-          { email: user?.email, last_sign_in: user?.last_sign_in_at, role: 'Admin/Dev' }
+          { 
+            email: user?.email, 
+            last_sign_in: user?.last_sign_in_at, 
+            role: 'Admin/Dev' 
+          }
         ]
       });
     } catch (error) {
@@ -71,6 +77,15 @@ export default function AdminDashboard() {
   if (!isDev) {
     return <Navigate to="/" />;
   }
+
+  const safeFormatDate = (dateStr: string | undefined) => {
+    if (!dateStr) return 'N/A';
+    try {
+      return format(new Date(dateStr), 'Pp', { locale: es });
+    } catch (e) {
+      return 'Fecha inválida';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 font-sans p-4 sm:p-8">
@@ -149,7 +164,7 @@ export default function AdminDashboard() {
             <section className="bg-gray-900/40 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-2xl">
               <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-violet-900/10 to-transparent">
                 <h2 className="font-bold flex items-center gap-2">
-                  <BarChart3 size={20} className="text-violet-400" />
+                  <BarChart size={20} className="text-violet-400" />
                   Métricas de Actividad
                 </h2>
                 <span className="text-xs text-gray-500 font-mono">LIVE_FEED</span>
@@ -202,7 +217,7 @@ export default function AdminDashboard() {
                       <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                         <td className="p-6 font-mono text-xs text-violet-400">AUTH_SUCCESS</td>
                         <td className="p-6 font-bold">{log.email}</td>
-                        <td className="p-6 text-gray-400">{format(new Date(log.last_sign_in), 'Pp', { locale: es })}</td>
+                        <td className="p-6 text-gray-400">{safeFormatDate(log.last_sign_in)}</td>
                         <td className="p-6 text-right">
                           <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded text-[10px] font-bold">SECURE</span>
                         </td>
@@ -252,8 +267,8 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ icon, label, value, color }: { icon: any, label: string, value: any, color: string }) {
-  const colorMap: any = {
+function StatCard({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string | number, color: string }) {
+  const colorMap: Record<string, string> = {
     blue: 'bg-blue-500/10 text-blue-500',
     violet: 'bg-violet-500/10 text-violet-500',
     emerald: 'bg-emerald-500/10 text-emerald-500',
@@ -272,7 +287,7 @@ function StatCard({ icon, label, value, color }: { icon: any, label: string, val
 }
 
 function ResourceMeter({ label, value, color }: { label: string, value: number, color: string }) {
-  const colorMap: any = {
+  const colorMap: Record<string, string> = {
     emerald: 'bg-emerald-500',
     violet: 'bg-violet-500',
     blue: 'bg-blue-500'
