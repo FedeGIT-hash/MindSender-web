@@ -18,9 +18,8 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, MessageCircle } from 'lucide-react';
-import ChatInterface from '../components/Chat/ChatInterface';
-import { useChat } from '../context/ChatContext';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Sparkles, Bot } from 'lucide-react';
+import SenderAI from '../components/AI/SenderAI';
 
 interface Task {
   id: string;
@@ -36,9 +35,8 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const { friendRequests } = useChat();
   const [newTask, setNewTask] = useState({ subject: '', description: '' });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
@@ -461,14 +459,15 @@ export default function Dashboard() {
             
             <div className="flex items-center gap-2">
               <button 
-                onClick={() => setIsChatOpen(true)}
-                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300 relative"
-                title="Chat"
+                onClick={() => setIsAIOpen(true)}
+                className="p-2 text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-all duration-300 relative group"
+                title="Sender AI"
               >
-                <MessageCircle size={24} />
-                {friendRequests.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                )}
+                <Bot size={24} />
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+                </span>
               </button>
 
               <button 
@@ -722,8 +721,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Chat Interface */}
-      <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      {/* Sender AI Interface */}
+      <SenderAI isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
     </div>
   );
 }
