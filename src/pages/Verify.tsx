@@ -25,7 +25,7 @@ export default function Verify() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Decoration */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M0 0 C 50 100 80 100 100 0 Z" fill="#bbf7d0" opacity="0.2" />
@@ -35,30 +35,30 @@ export default function Verify() {
 
       <div
         ref={formRef}
-        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center relative z-10 border border-gray-100"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md text-center relative z-10 border border-gray-100 dark:border-gray-700"
       >
-        <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <Mail className="text-green-600" size={32} />
+        <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
+          <Mail className="text-green-600 dark:text-green-400" size={32} />
         </div>
         
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           Verifica tu Correo
         </h2>
-        <p className="text-gray-600 mb-6">
-          Hemos enviado un enlace de confirmación a <span className="font-semibold text-green-700">{email}</span>.
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          Hemos enviado un enlace de confirmación a <span className="font-semibold text-green-700 dark:text-green-400">{email}</span>.
           <br /><br />
           Por favor, revisa tu bandeja de entrada (y spam) y haz clic en el enlace para activar tu cuenta.
         </p>
 
         <Link
           to="/login"
-          className="inline-flex items-center justify-center gap-2 w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition duration-300 shadow-lg shadow-green-200"
+          className="inline-flex items-center justify-center gap-2 w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition duration-300 shadow-lg shadow-green-200 dark:shadow-none"
         >
           Ir a Iniciar Sesión <ArrowRight size={20} />
         </Link>
         
-        <p className="mt-6 text-sm text-gray-500">
-          ¿No recibiste el correo? <span className="text-green-600 cursor-pointer hover:underline">Reenviar</span>
+        <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+          ¿No recibiste el correo? <span className="text-green-600 dark:text-green-400 cursor-pointer hover:underline">Reenviar</span>
         </p>
       </div>
     </div>

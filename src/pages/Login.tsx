@@ -72,9 +72,9 @@ export default function Login() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen flex bg-white overflow-hidden">
+    <div ref={containerRef} className="min-h-screen flex bg-white dark:bg-gray-900 overflow-hidden">
       {/* Left Side - Decoration */}
-      <div ref={decorationRef} className="hidden lg:flex lg:w-1/2 relative bg-gray-50 items-center justify-center p-12 overflow-hidden">
+      <div ref={decorationRef} className="hidden lg:flex lg:w-1/2 relative bg-gray-50 dark:bg-gray-900 items-center justify-center p-12 overflow-hidden">
         {/* Animated Background Shapes */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice">
           <path 
@@ -103,14 +103,14 @@ export default function Login() {
         </svg>
 
         <div className="relative z-10 max-w-lg">
-          <h1 className="decoration-text text-5xl font-bold text-gray-900 mb-2">
+          <h1 className="decoration-text text-5xl font-bold text-gray-900 dark:text-white mb-2">
             MindSender
           </h1>
-          <p className="decoration-text text-xl text-green-600 font-semibold mb-8">
+          <p className="decoration-text text-xl text-green-600 dark:text-green-400 font-semibold mb-8">
             Lott
           </p>
-          <div className="decoration-text bg-white/80 backdrop-blur-sm p-6 rounded-2xl border-l-4 border-green-500 shadow-lg">
-            <p className="text-2xl text-gray-700 italic font-medium leading-relaxed">
+          <div className="decoration-text bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl border-l-4 border-green-500 shadow-lg">
+            <p className="text-2xl text-gray-700 dark:text-gray-300 italic font-medium leading-relaxed">
               "No es muy bueno sobrepensar, créelo, mejor prepara un café y realízalo con calma."
             </p>
           </div>
@@ -118,30 +118,30 @@ export default function Login() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-900">
         <div
           ref={formRef}
           className="w-full max-w-md"
         >
           <div className="mb-8 text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Bienvenido de nuevo</h2>
-            <p className="text-gray-500">Ingresa tus credenciales para acceder</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Bienvenido de nuevo</h2>
+            <p className="text-gray-500 dark:text-gray-400">Ingresa tus credenciales para acceder</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm text-center">
                 {error}
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Correo Electrónico</label>
               <div className="relative group">
-                <Mail className="absolute left-3 top-3 text-gray-400 group-focus-within:text-green-500 transition-colors" size={20} />
+                <Mail className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
                 <input
                   type="email"
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
                   placeholder="nombre@ejemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -150,13 +150,13 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contraseña</label>
               <div className="relative group">
-                <Lock className="absolute left-3 top-3 text-gray-400 group-focus-within:text-green-500 transition-colors" size={20} />
+                <Lock className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
                 <input
                   type="password"
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -167,15 +167,15 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-green-600 text-white py-3.5 rounded-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] shadow-lg shadow-green-200 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-green-600 text-white py-3.5 rounded-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] shadow-lg shadow-green-200 dark:shadow-none disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? 'Iniciando...' : 'Iniciar Sesión'}
             </button>
           </form>
 
-          <p className="mt-8 text-center text-gray-600">
+          <p className="mt-8 text-center text-gray-600 dark:text-gray-400">
             ¿No tienes cuenta?{' '}
-            <Link to="/register" className="text-green-600 hover:text-green-700 font-semibold hover:underline">
+            <Link to="/register" className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold hover:underline">
               Regístrate aquí
             </Link>
           </p>

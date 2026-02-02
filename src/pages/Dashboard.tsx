@@ -18,8 +18,9 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
+import { useTheme } from '../context/ThemeContext';
 
 interface Task {
   id: string;
@@ -31,6 +32,7 @@ interface Task {
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -327,9 +329,9 @@ export default function Dashboard() {
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
     return (
-      <div className="calendar-card bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+      <div className="calendar-card bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 dark:border-gray-700/50 overflow-hidden transition-all duration-300 hover:shadow-2xl">
         {/* Calendar Header */}
-        <div className="flex justify-between items-center p-6 bg-gradient-to-r from-emerald-600 to-green-500 text-white">
+        <div className="flex justify-between items-center p-6 bg-gradient-to-r from-emerald-600 to-green-500 dark:from-emerald-900 dark:to-emerald-800 text-white">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
               <h2 className="text-2xl font-bold capitalize tracking-tight">
@@ -351,16 +353,16 @@ export default function Dashboard() {
         </div>
         
         {/* Days Header */}
-        <div className="grid grid-cols-7 text-center bg-gray-50/50 border-b border-gray-100">
+        <div className="grid grid-cols-7 text-center bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
           {weekDays.map(day => (
-            <div key={day} className="py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <div key={day} className="py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar Grid */}
-        <div className="calendar-grid-content grid grid-cols-7 bg-gray-50/30">
+        <div className="calendar-grid-content grid grid-cols-7 bg-gray-50/30 dark:bg-gray-900/30">
           {days.map((day) => {
             const isCurrentMonth = isSameMonth(day, monthStart);
             const isToday = isSameDay(day, new Date());
@@ -371,14 +373,14 @@ export default function Dashboard() {
                 key={day.toString()}
                 onClick={() => onDateClick(day)}
                 className={`
-                  min-h-[140px] p-3 border-b border-r border-gray-100/50 transition-all cursor-pointer group relative
-                  ${!isCurrentMonth ? 'bg-gray-50/50 text-gray-300' : 'bg-white hover:bg-emerald-50/30'}
-                  ${isToday ? 'bg-emerald-50/50' : ''}
+                  min-h-[140px] p-3 border-b border-r border-gray-100/50 dark:border-gray-700/50 transition-all cursor-pointer group relative
+                  ${!isCurrentMonth ? 'bg-gray-50/50 dark:bg-gray-900/50 text-gray-300 dark:text-gray-600' : 'bg-white dark:bg-gray-800 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10'}
+                  ${isToday ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : ''}
                 `}
               >
                 <div className={`
                   flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium mb-2 transition-all
-                  ${isToday ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'group-hover:bg-gray-100 text-gray-600'}
+                  ${isToday ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-emerald-900/40' : 'group-hover:bg-gray-100 dark:group-hover:bg-gray-700 text-gray-600 dark:text-gray-400'}
                 `}>
                   {format(day, 'd')}
                 </div>
@@ -391,8 +393,8 @@ export default function Dashboard() {
                       className={`
                         group/task flex items-center gap-2 p-1.5 rounded-lg text-xs border transition-all duration-200
                         ${task.is_completed 
-                          ? 'bg-gray-100 text-gray-400 border-gray-100 decoration-gray-400' 
-                          : 'bg-white text-gray-700 border-gray-100 shadow-sm hover:shadow-md hover:border-emerald-200 hover:-translate-y-0.5'
+                          ? 'bg-gray-100 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-gray-700 decoration-gray-400' 
+                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-600 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-700 hover:-translate-y-0.5'
                         }
                       `}
                     >
@@ -421,9 +423,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gray-50 font-sans selection:bg-emerald-100 selection:text-emerald-900">
+    <div ref={containerRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 dark:selection:bg-emerald-900 dark:selection:text-emerald-100 transition-colors duration-300">
       {/* Navbar */}
-      <nav ref={headerRef} className="fixed top-0 w-full z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+      <nav ref={headerRef} className="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
@@ -432,25 +434,25 @@ export default function Dashboard() {
                   <img 
                     src={avatarUrl} 
                     alt="Profile" 
-                    className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-200 border-2 border-white"
+                    className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20 border-2 border-white dark:border-gray-700"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-200">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
               </div>
               <div>
-                <div className="text-sm text-gray-400 font-medium">Bienvenido</div>
-                <div className="font-bold text-gray-900 text-lg leading-none">
+                <div className="text-sm text-gray-400 dark:text-gray-500 font-medium">Bienvenido</div>
+                <div className="font-bold text-gray-900 dark:text-white text-lg leading-none">
                   <TextType 
                     text={[userName]} 
                     typingSpeed={100} 
                     deletingSpeed={50} 
                     pauseDuration={5000} 
                     loop={false}
-                    className="text-gray-900"
+                    className="text-gray-900 dark:text-white"
                     cursorCharacter=""
                   />
                 </div>
@@ -459,8 +461,16 @@ export default function Dashboard() {
             
             <div className="flex items-center gap-2">
               <button 
+                onClick={toggleTheme}
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800 dark:hover:text-amber-400 rounded-xl transition-all duration-300"
+                title={theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+              >
+                {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+              </button>
+
+              <button 
                 onClick={() => setIsAIOpen(true)}
-                className="p-2 text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-all duration-300 relative group"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
                 title="Sender AI"
               >
                 <Bot size={24} />
@@ -472,7 +482,7 @@ export default function Dashboard() {
 
               <button 
                 onClick={openSettings}
-                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300"
                 title="Configuración"
               >
                 <Settings size={24} />
@@ -480,7 +490,7 @@ export default function Dashboard() {
 
               <button 
                 onClick={signOut}
-                className="group flex items-center gap-2 px-4 py-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all duration-300 font-medium"
+                className="group flex items-center gap-2 px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800 transition-all duration-300 font-medium"
               >
                 <span className="hidden sm:inline">Cerrar Sesión</span>
                 <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -494,22 +504,24 @@ export default function Dashboard() {
       <main className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="dashboard-control">
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
-              Tu Agenda
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
+                Tu Agenda
+              </span>
             </h1>
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
               Organiza tus actividades y mantén el control.
             </p>
           </div>
           
           <button 
             onClick={() => onDateClick(new Date())}
-            className="dashboard-control group flex items-center gap-2 bg-gray-900 text-white px-6 py-3.5 rounded-2xl hover:bg-emerald-600 transition-all duration-300 shadow-xl hover:shadow-emerald-500/30 active:scale-95"
+            className="dashboard-control group flex items-center gap-3 bg-gray-900 dark:bg-emerald-600 text-white px-7 py-4 rounded-2xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-xl shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 active:scale-95 transform hover:-translate-y-0.5"
           >
-            <div className="bg-white/20 p-1 rounded-lg group-hover:bg-white/30 transition-colors">
-              <Plus size={20} />
+            <div className="bg-white/20 p-1.5 rounded-lg group-hover:bg-white/30 transition-colors">
+              <Plus size={20} className="text-white" />
             </div>
-            <span className="font-semibold">Nueva Tarea</span>
+            <span className="font-bold tracking-wide">Nueva Tarea</span>
           </button>
         </div>
 
@@ -521,21 +533,21 @@ export default function Dashboard() {
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div 
             ref={settingsOverlayRef}
-            className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-gray-900/20 dark:bg-black/40 backdrop-blur-sm transition-opacity"
             onClick={closeSettings}
           ></div>
           
           <div className="absolute inset-y-0 right-0 max-w-full flex">
             <div 
               ref={settingsModalRef}
-              className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full border-l border-gray-100"
+              className="w-screen max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl flex flex-col h-full border-l border-white/20 dark:border-gray-800"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-900">Perfil y Configuración</h2>
+              <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Perfil y Configuración</h2>
                 <button 
                   onClick={closeSettings}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full transition-colors"
                 >
                   <X size={24} />
                 </button>
@@ -547,24 +559,24 @@ export default function Dashboard() {
                   {/* Profile Photo Section */}
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-emerald-50 transition-all group-hover:ring-emerald-100">
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl ring-4 ring-emerald-50 dark:ring-emerald-900/20 transition-all group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900/40">
                         {avatarUrl ? (
                           <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
+                          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                             <User size={48} />
                           </div>
                         )}
                       </div>
                       
                       {/* Overlay for edit */}
-                      <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                        <Camera className="text-white drop-shadow-md" size={32} />
+                      <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                        <Camera className="text-white drop-shadow-md transform scale-90 group-hover:scale-100 transition-transform" size={32} />
                       </div>
 
                       {/* Loading indicator */}
                       {uploading && (
-                        <div className="absolute inset-0 bg-white/80 rounded-full flex items-center justify-center z-10">
+                        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 rounded-full flex items-center justify-center z-10">
                           <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                       )}
@@ -580,7 +592,7 @@ export default function Dashboard() {
                     />
                     
                     <div className="text-center">
-                      <p className="text-sm font-medium text-emerald-600 cursor-pointer hover:text-emerald-700" onClick={() => fileInputRef.current?.click()}>
+                      <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 cursor-pointer hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors" onClick={() => fileInputRef.current?.click()}>
                         Cambiar foto de perfil
                       </p>
                     </div>
@@ -588,7 +600,7 @@ export default function Dashboard() {
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700 ml-1">Nombre Completo</label>
+                      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Nombre Completo</label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                           <User className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
@@ -597,7 +609,7 @@ export default function Dashboard() {
                           type="text"
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
-                          className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 text-gray-900 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium"
+                          className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400"
                           placeholder="Tu nombre"
                         />
                       </div>
@@ -608,7 +620,7 @@ export default function Dashboard() {
                     <button
                       type="submit"
                       disabled={loading || uploading}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gray-900 text-white font-bold hover:bg-emerald-600 transition-all duration-300 shadow-lg shadow-gray-200 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
                     >
                       {loading ? (
                         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -632,35 +644,35 @@ export default function Dashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
             ref={overlayRef}
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={closeModal}
           ></div>
           <div 
             ref={modalRef}
-            className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-100"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl w-full max-w-md p-8 relative z-10 border border-white/20 dark:border-gray-800"
           >
             <div className="absolute top-6 right-6">
-              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors">
+              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full transition-colors">
                 <Plus size={24} className="rotate-45" />
               </button>
             </div>
 
             <div className="mb-8">
-              <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold tracking-wide uppercase mb-3">
+              <span className="inline-block px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-bold tracking-wide uppercase mb-4 border border-emerald-200 dark:border-emerald-800">
                 Nueva Entrada
               </span>
-              <h3 className="text-3xl font-bold text-gray-900">
+              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                 Crear Tarea
               </h3>
-              <p className="text-gray-500 mt-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <p className="text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
                 {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: es })}
               </p>
             </div>
 
             <form onSubmit={handleAddTask} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Materia / Asignatura</label>
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Materia / Asignatura</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <BookOpen className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
@@ -669,7 +681,7 @@ export default function Dashboard() {
                     type="text"
                     required
                     placeholder="Ej. Matemáticas Avanzadas"
-                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 text-gray-900 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400"
+                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400"
                     value={newTask.subject}
                     onChange={(e) => setNewTask({ ...newTask, subject: e.target.value })}
                   />
@@ -677,7 +689,7 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Descripción</label>
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Descripción</label>
                 <div className="relative group">
                   <div className="absolute top-4 left-4 pointer-events-none">
                     <FileText className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
@@ -686,7 +698,7 @@ export default function Dashboard() {
                     required
                     placeholder="¿Qué necesitas realizar?"
                     rows={4}
-                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 text-gray-900 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 resize-none"
+                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 resize-none"
                     value={newTask.description}
                     onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   />
@@ -697,14 +709,14 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-6 py-4 rounded-2xl border-2 border-gray-100 text-gray-600 font-bold hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                  className="flex-1 px-6 py-4 rounded-2xl border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-4 rounded-2xl bg-gray-900 text-white font-bold hover:bg-emerald-600 transition-all duration-300 shadow-lg shadow-gray-200 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-4 rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
                 >
                   {loading ? (
                     <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
