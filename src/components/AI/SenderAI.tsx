@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, Sparkles, Bot, AlertCircle } from 'lucide-react';
+import { X, Send, Sparkles, Bot } from 'lucide-react';
 import gsap from 'gsap';
 import { groq, hasGroqKey } from '../../lib/groq';
 
@@ -28,7 +28,7 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
