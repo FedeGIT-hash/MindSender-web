@@ -120,14 +120,14 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50 border-l border-white/20 dark:border-gray-800 transform translate-x-full flex flex-col"
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gradient-to-r from-violet-50 to-white dark:from-violet-900/20 dark:to-gray-900">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
-            <Bot className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+      <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gradient-to-r from-violet-50 to-white dark:from-violet-900/20 dark:to-gray-900">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
+            <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-violet-600 dark:text-violet-400" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-gray-800 dark:text-white">Sender AI</h2>
-            <span className="text-[10px] font-mono bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded border border-violet-200 dark:border-violet-800">
+            <h2 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">Sender AI</h2>
+            <span className="text-[9px] sm:text-[10px] font-mono bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded border border-violet-200 dark:border-violet-800">
               delta 1.0 (Groq)
             </span>
           </div>
@@ -138,14 +138,14 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-gray-900/50">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 bg-slate-50/50 dark:bg-gray-900/50">
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+            <div className={`max-w-[90%] sm:max-w-[85%] rounded-2xl p-3 sm:p-4 shadow-sm ${
               msg.role === 'user' ? 'bg-violet-600 text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 rounded-tl-none'
             }`}>
-              <p className="text-sm leading-relaxed">{msg.content}</p>
-              <span className={`text-[10px] mt-1 block ${msg.role === 'user' ? 'text-violet-200' : 'text-gray-400 dark:text-gray-500'}`}>
+              <p className="text-xs sm:text-sm leading-relaxed">{msg.content}</p>
+              <span className={`text-[9px] sm:text-[10px] mt-1 block ${msg.role === 'user' ? 'text-violet-200' : 'text-gray-400 dark:text-gray-500'}`}>
                 {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
@@ -153,9 +153,9 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1 animate-pulse">
-              <Sparkles className="w-4 h-4 text-violet-400" />
-              <span className="text-xs text-gray-400 dark:text-gray-500">Escribiendo...</span>
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-3 sm:p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1 animate-pulse">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400" />
+              <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">Escribiendo...</span>
             </div>
           </div>
         )}
@@ -163,21 +163,21 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSend} className="p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+      <form onSubmit={handleSend} className="p-3 sm:p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
         <div className="flex gap-2">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Pregúntale algo a Sender AI..."
-            className="w-full pl-4 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            placeholder="Pregúntale algo..."
+            className="w-full pl-4 pr-4 py-2 sm:py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none text-xs sm:text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             rows={1}
           />
           <button 
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="p-3 bg-violet-600 text-white rounded-xl hover:bg-violet-700 disabled:opacity-50 shadow-lg shadow-violet-200 dark:shadow-none"
+            className="p-2 sm:p-3 bg-violet-600 text-white rounded-lg sm:rounded-xl hover:bg-violet-700 disabled:opacity-50 shadow-lg shadow-violet-200 dark:shadow-none transition-all active:scale-95"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </form>

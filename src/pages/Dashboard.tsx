@@ -402,43 +402,43 @@ export default function Dashboard() {
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
     return (
-      <div className="calendar-card bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+      <div className="calendar-card bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
         {/* Calendar Header */}
-        <div className="flex justify-between items-center p-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500 dark:from-emerald-900 dark:via-emerald-800 dark:to-green-900 text-white relative overflow-hidden">
+        <div className="flex justify-between items-center p-5 sm:p-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500 dark:from-emerald-900 dark:via-emerald-800 dark:to-green-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-          <div className="flex items-center gap-6 relative z-10">
-            <div className="p-3 bg-white/20 rounded-[1.5rem] backdrop-blur-md border border-white/30 shadow-inner">
-              <h2 className="text-3xl font-extrabold capitalize tracking-tight leading-none mb-1">
+          <div className="flex items-center gap-4 sm:gap-6 relative z-10">
+            <div className="p-2 sm:p-3 bg-white/20 rounded-2xl sm:rounded-[1.5rem] backdrop-blur-md border border-white/30 shadow-inner">
+              <h2 className="text-xl sm:text-3xl font-extrabold capitalize tracking-tight leading-none mb-1">
                 {format(currentDate, 'MMMM', { locale: es })}
               </h2>
-              <span className="text-emerald-100/80 text-sm font-bold tracking-[0.2em] uppercase">
+              <span className="text-emerald-100/80 text-[10px] sm:text-sm font-bold tracking-[0.1em] sm:tracking-[0.2em] uppercase">
                 {format(currentDate, 'yyyy', { locale: es })}
               </span>
             </div>
           </div>
-          <div className="flex gap-3 relative z-10">
-            <button onClick={handlePrevMonth} className="p-3 hover:bg-white/20 rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
-              <ChevronLeft size={28} className="group-hover:-translate-x-0.5 transition-transform" />
+          <div className="flex gap-2 sm:gap-3 relative z-10">
+            <button onClick={handlePrevMonth} className="p-2 sm:p-3 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
+              <ChevronLeft size={20} className="sm:w-7 sm:h-7 group-hover:-translate-x-0.5 transition-transform" />
             </button>
-            <button onClick={handleNextMonth} className="p-3 hover:bg-white/20 rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
-              <ChevronRight size={28} className="group-hover:translate-x-0.5 transition-transform" />
+            <button onClick={handleNextMonth} className="p-2 sm:p-3 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
+              <ChevronRight size={20} className="sm:w-7 sm:h-7 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>
 
-        <div className="p-8 bg-white/50 dark:bg-gray-800/50">
+        <div className="p-4 sm:p-8 bg-white/50 dark:bg-gray-800/50">
           <div className="calendar-grid-content">
             {/* Weekdays */}
-            <div className="grid grid-cols-7 gap-4 mb-6">
+            <div className="grid grid-cols-7 gap-1 sm:gap-4 mb-4 sm:mb-6">
               {weekDays.map((day) => (
-                <div key={day} className="text-center text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                <div key={day} className="text-center text-[10px] sm:text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.1em] sm:tracking-[0.2em]">
                   {day}
                 </div>
               ))}
             </div>
 
             {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-4">
+            <div className="grid grid-cols-7 gap-1 sm:gap-4">
               {days.map((day, idx) => {
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const isToday = isSameDay(day, new Date());
@@ -448,7 +448,7 @@ export default function Dashboard() {
                   <div 
                     key={idx}
                     onClick={() => onDateClick(day)}
-                    className={`group relative min-h-[140px] p-4 rounded-3xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
+                    className={`group relative min-h-[100px] sm:min-h-[140px] p-2 sm:p-4 rounded-xl sm:rounded-3xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
                       !isCurrentMonth 
                         ? 'bg-gray-50/30 dark:bg-gray-900/10 border-transparent opacity-40' 
                         : isToday
@@ -456,8 +456,8 @@ export default function Dashboard() {
                           : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-xl hover:-translate-y-1'
                     }`}
                   >
-                    <div className="flex justify-between items-start mb-3 relative z-10">
-                      <span className={`text-xl font-bold transition-colors ${
+                    <div className="flex justify-between items-start mb-2 sm:mb-3 relative z-10">
+                      <span className={`text-base sm:text-xl font-bold transition-colors ${
                         isToday 
                           ? 'text-emerald-600 dark:text-emerald-400' 
                           : isCurrentMonth 
@@ -467,28 +467,28 @@ export default function Dashboard() {
                         {format(day, 'd')}
                       </span>
                       {dayTasks.length > 0 && (
-                        <span className="flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                        <span className="flex h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                       )}
                     </div>
                     
-                    <div className="space-y-1.5 relative z-10">
+                    <div className="space-y-1 sm:space-y-1.5 relative z-10">
                       {dayTasks.slice(0, 2).map((task) => (
                         <div 
                           key={task.id}
                           onClick={(e) => handleToggleComplete(e, task)}
-                          className={`text-[10px] p-2 rounded-xl border transition-all duration-200 flex items-center gap-2 group/task ${
+                          className={`text-[8px] sm:text-[10px] p-1 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-200 flex items-center gap-1 sm:gap-2 group/task ${
                             task.is_completed 
                               ? 'bg-gray-100/50 dark:bg-gray-700/30 border-transparent text-gray-400 line-through' 
                               : 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-[1.02]'
                           }`}
                         >
-                          {task.is_completed ? <CheckCircle2 size={12} /> : <Circle size={12} className="group-hover/task:scale-110 transition-transform" />}
+                          {task.is_completed ? <CheckCircle2 size={10} className="sm:w-3 sm:h-3" /> : <Circle size={10} className="sm:w-3 sm:h-3 group-hover/task:scale-110 transition-transform" />}
                           <span className="truncate">{task.subject}</span>
                         </div>
                       ))}
                       {dayTasks.length > 2 && (
-                        <div className="text-[9px] text-gray-400 dark:text-gray-500 font-bold pl-2">
-                          + {dayTasks.length - 2} más
+                        <div className="text-[8px] sm:text-[9px] text-gray-400 dark:text-gray-500 font-bold pl-1 sm:pl-2">
+                          + {dayTasks.length - 2}
                         </div>
                       )}
                     </div>
@@ -496,9 +496,9 @@ export default function Dashboard() {
                     {/* Hover indicator gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
-                    {/* Add indicator on hover */}
+                    {/* Add indicator on hover - hidden on small screens */}
                     {isCurrentMonth && (
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-2 group-hover:translate-x-0">
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-2 group-hover:translate-x-0 hidden sm:block">
                         <Plus size={18} />
                       </div>
                     )}
@@ -531,25 +531,25 @@ export default function Dashboard() {
       {/* Navbar */}
       <nav ref={headerRef} className="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24">
-            <div className="flex items-center gap-4">
+          <div className="flex justify-between items-center h-20 sm:h-24">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div className="relative">
                 {avatarUrl ? (
                   <img 
                     src={avatarUrl} 
                     alt="Profile" 
-                    className="w-12 h-12 rounded-2xl object-cover shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700 transform hover:scale-105 transition-transform duration-300"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl object-cover shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700 transform hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></div>
               </div>
               <div>
-                <div className="text-base text-gray-400 dark:text-gray-500 font-semibold tracking-wide uppercase">Bienvenido</div>
-                <div className="font-extrabold text-gray-900 dark:text-white text-2xl leading-tight tracking-tight">
+                <div className="text-[10px] sm:text-base text-gray-400 dark:text-gray-500 font-semibold tracking-wide uppercase leading-none mb-1">Bienvenido</div>
+                <div className="font-extrabold text-gray-900 dark:text-white text-base sm:text-2xl leading-tight tracking-tight">
                   <TextType 
                     text={[userName]} 
                     typingSpeed={100} 
@@ -563,23 +563,23 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <button 
                 onClick={toggleTheme}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800 dark:hover:text-amber-400 rounded-xl transition-all duration-300"
+                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800 dark:hover:text-amber-400 rounded-xl transition-all duration-300"
                 title={theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
               >
-                {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+                {theme === 'dark' ? <Sun size={20} className="sm:w-6 sm:h-6" /> : <Moon size={20} className="sm:w-6 sm:h-6" />}
               </button>
 
               <button 
                 onClick={openNotifications}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
+                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
                 title="Notificaciones"
               >
-                <Bell size={24} className={notifications.length > 0 ? "animate-swing" : ""} />
+                <Bell size={20} className={`sm:w-6 sm:h-6 ${notifications.length > 0 ? "animate-swing" : ""}`} />
                 {notifications.length > 0 && (
-                  <span className="absolute top-2 right-2 flex h-2 w-2">
+                  <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                   </span>
@@ -588,30 +588,30 @@ export default function Dashboard() {
 
               <button 
                 onClick={() => setIsAIOpen(true)}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
+                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
                 title="Sender AI"
               >
-                <Bot size={24} />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <Bot size={20} className="sm:w-6 sm:h-6" />
+                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 flex h-2 w-2 sm:h-3 sm:w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-violet-500"></span>
                 </span>
               </button>
 
               <button 
                 onClick={openSettings}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300"
+                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300"
                 title="Configuración"
               >
-                <Settings size={24} />
+                <Settings size={20} className="sm:w-6 sm:h-6" />
               </button>
 
               <button 
                 onClick={signOut}
-                className="group flex items-center gap-2 px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800 transition-all duration-300 font-medium"
+                className="group flex items-center gap-2 px-2 sm:px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800 transition-all duration-300 font-medium"
               >
-                <span className="hidden sm:inline">Cerrar Sesión</span>
-                <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
+                <span className="hidden md:inline text-sm">Cerrar Sesión</span>
+                <LogOut size={18} className="sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
@@ -619,27 +619,27 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
-        <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+      <main className="pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+        <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
           <div className="dashboard-control">
-            <h1 className="text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-3">
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2 sm:mb-3 text-center sm:text-left">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-200 dark:to-gray-400">
                 Tu Agenda
               </span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-xl font-medium max-w-lg">
-              Organiza tus actividades con precisión y estilo. Todo bajo control.
+            <p className="text-gray-500 dark:text-gray-400 text-base sm:text-xl font-medium max-w-lg text-center sm:text-left">
+              Organiza tus actividades con precisión y estilo.
             </p>
           </div>
           
           <button 
             onClick={() => onDateClick(new Date())}
-            className="dashboard-control group flex items-center gap-4 bg-gray-900 dark:bg-emerald-600 text-white px-8 py-5 rounded-3xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-500 shadow-2xl shadow-gray-300 dark:shadow-emerald-900/40 hover:shadow-emerald-500/50 active:scale-95 transform hover:-translate-y-1"
+            className="dashboard-control group flex items-center justify-center gap-3 sm:gap-4 bg-gray-900 dark:bg-emerald-600 text-white px-6 py-4 sm:px-8 sm:py-5 rounded-2xl sm:rounded-3xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-500 shadow-2xl shadow-gray-300 dark:shadow-emerald-900/40 hover:shadow-emerald-500/50 active:scale-95 transform hover:-translate-y-1"
           >
-            <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-all duration-300 group-hover:rotate-90">
-              <Plus size={24} className="text-white" />
+            <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg sm:rounded-xl group-hover:bg-white/30 transition-all duration-300 group-hover:rotate-90">
+              <Plus size={20} className="sm:w-6 sm:h-6 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">Nueva Tarea</span>
+            <span className="font-bold text-base sm:text-lg tracking-tight">Nueva Tarea</span>
           </button>
         </div>
 
@@ -658,11 +658,11 @@ export default function Dashboard() {
           <div className="absolute inset-y-0 right-0 max-w-full flex">
             <div 
               ref={settingsModalRef}
-              className="w-screen max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl flex flex-col h-full border-l border-white/20 dark:border-gray-800"
+              className="w-full sm:w-screen sm:max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl flex flex-col h-full border-l border-white/20 dark:border-gray-800"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Perfil y Configuración</h2>
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100 dark:border-gray-800">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Perfil y Configuración</h2>
                 <button 
                   onClick={closeSettings}
                   className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full transition-colors"
@@ -672,24 +672,24 @@ export default function Dashboard() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6">
-                <form onSubmit={handleUpdateProfile} className="space-y-8">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                <form onSubmit={handleUpdateProfile} className="space-y-6 sm:space-y-8">
                   {/* Profile Photo Section */}
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl ring-4 ring-emerald-50 dark:ring-emerald-900/20 transition-all group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900/40">
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl ring-4 ring-emerald-50 dark:ring-emerald-900/20 transition-all group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900/40">
                         {avatarUrl ? (
                           <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                            <User size={48} />
+                            <User size={40} className="sm:w-12 sm:h-12" />
                           </div>
                         )}
                       </div>
                       
                       {/* Overlay for edit */}
                       <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                        <Camera className="text-white drop-shadow-md transform scale-90 group-hover:scale-100 transition-transform" size={32} />
+                        <Camera className="text-white drop-shadow-md transform scale-90 group-hover:scale-100 transition-transform" size={24} className="sm:w-8 sm:h-8" />
                       </div>
 
                       {/* Loading indicator */}
@@ -710,7 +710,7 @@ export default function Dashboard() {
                     />
                     
                     <div className="text-center">
-                      <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 cursor-pointer hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors" onClick={() => fileInputRef.current?.click()}>
+                      <p className="text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 cursor-pointer hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors" onClick={() => fileInputRef.current?.click()}>
                         Cambiar foto de perfil
                       </p>
                     </div>
@@ -718,33 +718,33 @@ export default function Dashboard() {
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Nombre Completo</label>
+                      <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Nombre Completo</label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <User className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                          <User className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
                         </div>
                         <input
                           type="text"
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
-                          className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400"
+                          className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 text-sm sm:text-base"
                           placeholder="Tu nombre"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-4">
+                  <div className="pt-2 sm:pt-4">
                     <button
                       type="submit"
                       disabled={loading || uploading}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base"
                     >
                       {loading ? (
                         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
-                          <Save size={20} />
+                          <Save size={18} />
                           <span>Guardar Cambios</span>
                         </>
                       )}
@@ -769,17 +769,17 @@ export default function Dashboard() {
           <div className="absolute inset-y-0 right-0 max-w-full flex">
             <div 
               ref={notificationsModalRef}
-              className="w-screen max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl flex flex-col h-full border-l border-white/20 dark:border-gray-800"
+              className="w-full sm:w-screen sm:max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl flex flex-col h-full border-l border-white/20 dark:border-gray-800"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-900">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-900">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                    <BellRing className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <BellRing className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Notificaciones</h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Mantente al tanto de todo</p>
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Notificaciones</h2>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Mantente al tanto de todo</p>
                   </div>
                 </div>
                 <button 
@@ -791,56 +791,56 @@ export default function Dashboard() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
                 {notifications.length > 0 ? (
                   notifications.map((notif) => (
                     <div 
                       key={notif.id} 
-                      className="group p-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer relative overflow-hidden"
+                      className="group p-3 sm:p-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-xl sm:rounded-2xl hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer relative overflow-hidden"
                     >
-                      <div className="flex gap-4">
-                        <div className={`p-2 rounded-xl shrink-0 ${
+                      <div className="flex gap-3 sm:gap-4">
+                        <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl shrink-0 h-fit ${
                           notif.type === 'info' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
                           notif.type === 'alert' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' :
                           'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
                         }`}>
-                          {notif.type === 'alert' ? <AlertTriangle size={20} /> : <Info size={20} />}
+                          {notif.type === 'alert' ? <AlertTriangle size={16} className="sm:w-5 sm:h-5" /> : <Info size={16} className="sm:w-5 sm:h-5" />}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-1">
-                            <h4 className="font-bold text-gray-900 dark:text-white text-sm">{notif.title}</h4>
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{notif.time}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start mb-0.5 sm:mb-1">
+                            <h4 className="font-bold text-gray-900 dark:text-white text-xs sm:text-sm truncate pr-2">{notif.title}</h4>
+                            <span className="text-[8px] sm:text-[10px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap">{notif.time}</span>
                           </div>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{notif.message}</p>
+                          <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{notif.message}</p>
                         </div>
                       </div>
                       {/* Decorative gradient on hover */}
-                      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                      <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                     </div>
                   ))
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-10">
-                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                      <Bell className="w-10 h-10 text-gray-300 dark:text-gray-600" />
+                  <div className="flex flex-col items-center justify-center h-full text-center p-6 sm:p-10">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                      <Bell className="w-8 h-8 sm:w-10 sm:h-10 text-gray-300 dark:text-gray-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Sin notificaciones</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Todo está al día por ahora.</p>
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Sin notificaciones</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">Todo está al día por ahora.</p>
                   </div>
                 )}
 
                 {/* System Alerts Space Placeholder */}
-                <div className="mt-8 p-6 rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 dark:from-black dark:to-gray-900 text-white relative overflow-hidden border border-white/10">
+                <div className="mt-6 sm:mt-8 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 dark:from-black dark:to-gray-900 text-white relative overflow-hidden border border-white/10">
                   <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <Bot size={80} />
+                    <Bot size={60} className="sm:w-20 sm:h-20" />
                   </div>
-                  <h4 className="text-lg font-bold mb-2 flex items-center gap-2">
+                  <h4 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 flex items-center gap-2">
                     <span className="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
                     Alertas del Sistema
                   </h4>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    Este espacio está reservado para notificaciones críticas y mensajes de Sender AI que requieren tu atención inmediata.
+                  <p className="text-[10px] sm:text-xs text-gray-400 leading-relaxed">
+                    Este espacio está reservado para notificaciones críticas y mensajes de Sender AI.
                   </p>
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-3 sm:mt-4 flex gap-2">
                     <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
                       <div className="h-full bg-blue-500 w-1/3"></div>
                     </div>
@@ -862,39 +862,39 @@ export default function Dashboard() {
           ></div>
           <div 
             ref={modalRef}
-            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl w-full max-w-md p-8 relative z-10 border border-white/20 dark:border-gray-800"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-md p-6 sm:p-8 relative z-10 border border-white/20 dark:border-gray-800"
           >
-            <div className="absolute top-6 right-6">
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
               <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full transition-colors">
                 <Plus size={24} className="rotate-45" />
               </button>
             </div>
 
-            <div className="mb-8">
-              <span className="inline-block px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-bold tracking-wide uppercase mb-4 border border-emerald-200 dark:border-emerald-800">
+            <div className="mb-6 sm:mb-8">
+              <span className="inline-block px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase mb-3 sm:mb-4 border border-emerald-200 dark:border-emerald-800">
                 Nueva Entrada
               </span>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                 Crear Tarea
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2 font-medium">
+              <p className="text-sm sm:text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2 font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
                 {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: es })}
               </p>
             </div>
 
-            <form onSubmit={handleAddTask} className="space-y-6">
+            <form onSubmit={handleAddTask} className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Materia / Asignatura</label>
+                <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Materia / Asignatura</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <BookOpen className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                    <BookOpen className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
                   </div>
                   <input
                     type="text"
                     required
                     placeholder="Ej. Matemáticas Avanzadas"
-                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400"
+                    className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 text-sm sm:text-base"
                     value={newTask.subject}
                     onChange={(e) => setNewTask({ ...newTask, subject: e.target.value })}
                   />
@@ -902,34 +902,34 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Descripción</label>
+                <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Descripción</label>
                 <div className="relative group">
-                  <div className="absolute top-4 left-4 pointer-events-none">
-                    <FileText className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                  <div className="absolute top-3.5 left-4 pointer-events-none">
+                    <FileText className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
                   </div>
                   <textarea
                     required
                     placeholder="¿Qué necesitas realizar?"
-                    rows={4}
-                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 resize-none"
+                    rows={3}
+                    className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 resize-none text-sm sm:text-base"
                     value={newTask.description}
                     onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-3 sm:gap-4 pt-2 sm:pt-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-6 py-4 rounded-2xl border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 text-sm sm:text-base"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-4 rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm sm:text-base"
                 >
                   {loading ? (
                     <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
