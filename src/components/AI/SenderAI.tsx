@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot } from 'lucide-react';
 import gsap from 'gsap';
 import { groq, hasGroqKey } from '../../lib/groq';
+import { SYSTEM_PROMPT } from '../../lib/systemPrompt';
 
 interface SenderAIProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
           messages: [
             { 
               role: "system", 
-              content: "Eres Sender AI (delta 1.0), un asistente de productividad para MindSender. Responde siempre en español, de forma concisa y amigable." 
+              content: SYSTEM_PROMPT 
             },
             ...apiMessages
           ] as any,
