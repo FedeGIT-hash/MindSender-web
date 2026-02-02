@@ -80,7 +80,7 @@ export default function Dashboard() {
     if (user?.user_metadata) {
       setUserName(user.user_metadata.full_name || user.email?.split('@')[0] || 'Usuario');
       setAvatarUrl(user.user_metadata.avatar_url || null);
-      setIsDev(user.user_metadata.role === 'admin' || user.email === 'lott@mindsender.com'); // Mark as Dev if admin
+      setIsDev(user.user_metadata.role === 'admin'); // Mark as Dev if admin
     }
     
     if (user) {

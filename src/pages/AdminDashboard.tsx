@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
 
-  const isDev = user?.user_metadata?.role === 'admin' || user?.email === 'lott@mindsender.com';
+  const isDev = user?.user_metadata?.role === 'admin';
 
   useEffect(() => {
     if (isDev) {
