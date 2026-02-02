@@ -18,7 +18,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save } from 'lucide-react';
 
 interface Task {
   id: string;
@@ -33,24 +33,29 @@ export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState({ subject: '', description: '' });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
+  const settingsModalRef = useRef<HTMLDivElement>(null);
+  const settingsOverlayRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Get user name from metadata or profile
-    if (user?.user_metadata?.full_name) {
-      setUserName(user.user_metadata.full_name);
-    } else {
-      setUserName(user?.email?.split('@')[0] || 'Usuario');
+    // Get user name and avatar from metadata
+    if (user?.user_metadata) {
+      setUserName(user.user_metadata.full_name || user.email?.split('@')[0] || 'Usuario');
+      setAvatarUrl(user.user_metadata.avatar_url || null);
     }
-
+    
     if (user) {
       const fetchTasks = async () => {
         const { data, error } = await supabase
@@ -150,6 +155,101 @@ export default function Dashboard() {
         onComplete: () => setIsModalOpen(false)
       });
       gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, delay: 0.1 });
+    }
+  };
+
+  const openSettings = () => {
+    setIsSettingsOpen(true);
+    setTimeout(() => {
+      if (settingsModalRef.current && settingsOverlayRef.current) {
+        gsap.set(settingsModalRef.current, { x: '100%', opacity: 0 });
+        gsap.set(settingsOverlayRef.current, { opacity: 0 });
+        
+        gsap.to(settingsOverlayRef.current, { opacity: 1, duration: 0.3 });
+        gsap.to(settingsModalRef.current, { 
+          x: '0%', 
+          opacity: 1, 
+          duration: 0.5, 
+          ease: 'power3.out' 
+        });
+      }
+    }, 10);
+  };
+
+  const closeSettings = () => {
+    if (settingsModalRef.current && settingsOverlayRef.current) {
+      gsap.to(settingsModalRef.current, { 
+        x: '100%', 
+        opacity: 0, 
+        duration: 0.4, 
+        ease: 'power3.in' 
+      });
+      gsap.to(settingsOverlayRef.current, { 
+        opacity: 0, 
+        duration: 0.3, 
+        delay: 0.1,
+        onComplete: () => setIsSettingsOpen(false) 
+      });
+    }
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true);
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('Debe seleccionar una imagen para subir.');
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      setAvatarUrl(data.publicUrl);
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      alert('Error al subir la imagen. Asegúrate de que el bucket "avatars" exista en Supabase.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          full_name: userName,
+          avatar_url: avatarUrl
+        }
+      });
+
+      if (error) throw error;
+      
+      // Also try to update profiles table if it exists
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ full_name: userName }) // We might not have avatar_url column in profiles yet
+          .eq('id', user.id);
+      }
+
+      closeSettings();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -325,8 +425,19 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-200">
-                M
+              <div className="relative">
+                {avatarUrl ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt="Profile" 
+                    className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-200 border-2 border-white"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-200">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
               <div>
                 <div className="text-sm text-gray-400 font-medium">Bienvenido</div>
@@ -380,6 +491,122 @@ export default function Dashboard() {
 
         {renderCalendar()}
       </main>
+
+        </div>
+
+        {renderCalendar()}
+      </main>
+
+      {/* Settings Panel - Side Drawer */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div 
+            ref={settingsOverlayRef}
+            className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"
+            onClick={closeSettings}
+          ></div>
+          
+          <div className="absolute inset-y-0 right-0 max-w-full flex">
+            <div 
+              ref={settingsModalRef}
+              className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full border-l border-gray-100"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-900">Perfil y Configuración</h2>
+                <button 
+                  onClick={closeSettings}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <form onSubmit={handleUpdateProfile} className="space-y-8">
+                  {/* Profile Photo Section */}
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-emerald-50 transition-all group-hover:ring-emerald-100">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
+                            <User size={48} />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Overlay for edit */}
+                      <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                        <Camera className="text-white drop-shadow-md" size={32} />
+                      </div>
+
+                      {/* Loading indicator */}
+                      {uploading && (
+                        <div className="absolute inset-0 bg-white/80 rounded-full flex items-center justify-center z-10">
+                          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      disabled={uploading}
+                    />
+                    
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-emerald-600 cursor-pointer hover:text-emerald-700" onClick={() => fileInputRef.current?.click()}>
+                        Cambiar foto de perfil
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700 ml-1">Nombre Completo</label>
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <User className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                        </div>
+                        <input
+                          type="text"
+                          value={userName}
+                          onChange={(e) => setUserName(e.target.value)}
+                          className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 text-gray-900 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium"
+                          placeholder="Tu nombre"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <button
+                      type="submit"
+                      disabled={loading || uploading}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gray-900 text-white font-bold hover:bg-emerald-600 transition-all duration-300 shadow-lg shadow-gray-200 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {loading ? (
+                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Save size={20} />
+                          <span>Guardar Cambios</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modern Modal */}
       {isModalOpen && (
