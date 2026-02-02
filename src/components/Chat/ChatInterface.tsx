@@ -17,7 +17,9 @@ export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
     messages, 
     sendMessage, 
     sendFriendRequest, 
-    acceptFriendRequest 
+    acceptFriendRequest,
+    isTyping,
+    sendTypingEvent
   } = useChat();
   
   const [activeTab, setActiveTab] = useState<'chats' | 'friends' | 'add'>('chats');
@@ -149,13 +151,28 @@ export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                 ))
               )}
               <div ref={messagesEndRef} />
+              
+              {/* Typing Indicator */}
+              {isTyping && (
+                <div className="flex justify-start animate-pulse">
+                  <div className="bg-gray-200 text-gray-500 text-xs py-1 px-3 rounded-full flex items-center gap-1">
+                    <span>Escribiendo</span>
+                    <span className="w-1 h-1 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-1 h-1 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-1 h-1 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSendMessage} className="p-3 border-t bg-white flex gap-2">
               <input
                 type="text"
                 value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
+                onChange={(e) => {
+                  setMessageInput(e.target.value);
+                  sendTypingEvent();
+                }}
                 placeholder="Escribe un mensaje..."
                 className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bg-gray-50"
               />

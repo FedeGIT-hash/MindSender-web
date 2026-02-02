@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
@@ -36,6 +36,8 @@ interface ChatContextType {
   setActiveChat: (userId: string | null) => void;
   sendMessage: (content: string) => Promise<void>;
   refreshFriendRequests: () => Promise<void>;
+  isTyping: boolean;
+  sendTypingEvent: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -47,6 +49,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch initial data
   useEffect(() => {
@@ -55,48 +59,80 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     fetchFriends();
   }, [user]);
 
-  // Real-time subscription for messages
+  // Real-time subscription for messages and typing
   useEffect(() => {
     if (!user || !activeChat) return;
 
     // Fetch initial messages for this chat
     fetchMessages(activeChat);
 
-    // Subscribe to new messages
+    // Create a unique room ID for this pair of users
+    // Ordenamos los IDs para asegurar que ambos usuarios se conecten a la misma sala
+    const roomId = [user.id, activeChat].sort().join('_');
+
+    // Subscribe to new messages and typing events
     const channel = supabase
-      .channel(`chat:${activeChat}`)
+      .channel(`chat_room:${roomId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'direct_messages',
-          // Quitamos el filtro explícito para dejar que RLS maneje la seguridad
-          // y así recibir tanto mensajes enviados como recibidos en tiempo real
         },
         (payload: RealtimePostgresChangesPayload<Message>) => {
           const newMessage = payload.new as Message;
           
           // Verificar si el mensaje pertenece al chat activo
-          // (Ya sea que lo envié yo o me lo enviaron)
           if (
             (newMessage.sender_id === activeChat && newMessage.receiver_id === user.id) ||
             (newMessage.sender_id === user.id && newMessage.receiver_id === activeChat)
           ) {
-            // Verificar si ya existe para evitar duplicados (por optimistic UI)
             setMessages((prev) => {
               if (prev.some(m => m.id === newMessage.id)) return prev;
               return [...prev, newMessage];
             });
+            // Si llega un mensaje, dejamos de mostrar "escribiendo"
+            setIsTyping(false);
           }
         }
       )
+      .on('broadcast', { event: 'typing' }, (payload) => {
+        if (payload.payload.sender_id === activeChat) {
+          setIsTyping(true);
+          
+          // Clear previous timeout
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+          }
+          
+          // Set new timeout to hide typing indicator
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsTyping(false);
+          }, 3000);
+        }
+      })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
   }, [user, activeChat]);
+
+  const sendTypingEvent = async () => {
+    if (!user || !activeChat) return;
+    
+    const roomId = [user.id, activeChat].sort().join('_');
+    
+    await supabase.channel(`chat_room:${roomId}`).send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { sender_id: user.id }
+    });
+  };
 
   const refreshFriendRequests = async () => {
     if (!user) return;
@@ -281,6 +317,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       rejectFriendRequest,
       setActiveChat,
       sendMessage,
+      isTyping,
+      sendTypingEvent,
       refreshFriendRequests
     }}>
       {children}
