@@ -81,52 +81,52 @@ export default function Dashboard() {
     }
 
     // Header animation with improved staggering
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
     
     tl.fromTo(headerRef.current, 
-      { y: -20, opacity: 0 }, 
-      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+      { y: -30, opacity: 0, filter: 'blur(10px)' }, 
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.2 }
     )
     .fromTo('.dashboard-control',
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power3.out' },
-      '-=0.4'
+      { y: 30, opacity: 0, filter: 'blur(5px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.15 },
+      '-=0.8'
     )
     .fromTo('.calendar-card', 
-      { scale: 0.95, opacity: 0 }, 
-      { scale: 1, opacity: 1, duration: 0.8, ease: 'power3.out' },
-      '-=0.4'
+      { scale: 0.9, opacity: 0, y: 40, filter: 'blur(10px)' }, 
+      { scale: 1, opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'expo.out' },
+      '-=1'
     )
     .fromTo('.bg-blob',
       { scale: 0, opacity: 0 },
-      { scale: 1, opacity: 0.6, duration: 1.5, stagger: 0.2, ease: 'elastic.out(1, 0.8)' },
-      '-=1'
+      { scale: 1, opacity: 0.6, duration: 2, stagger: 0.3, ease: 'elastic.out(1, 0.75)' },
+      '-=1.5'
     );
 
-    // Continuous floating animation for blobs
+    // Continuous floating animation for blobs with smoother motion
     gsap.to('.bg-blob-1', {
-      x: 'random(-50, 50)',
-      y: 'random(-50, 50)',
-      duration: 'random(10, 20)',
-      repeat: -1,
-      yoyo: true,
-      ease: 'none'
-    });
-    gsap.to('.bg-blob-2', {
-      x: 'random(-30, 30)',
-      y: 'random(-30, 30)',
+      x: 'random(-80, 80)',
+      y: 'random(-80, 80)',
       duration: 'random(15, 25)',
       repeat: -1,
       yoyo: true,
-      ease: 'none'
+      ease: 'sine.inOut'
     });
-    gsap.to('.bg-blob-3', {
-      x: 'random(-40, 40)',
-      y: 'random(-40, 40)',
-      duration: 'random(12, 18)',
+    gsap.to('.bg-blob-2', {
+      x: 'random(-60, 60)',
+      y: 'random(-60, 60)',
+      duration: 'random(20, 30)',
       repeat: -1,
       yoyo: true,
-      ease: 'none'
+      ease: 'sine.inOut'
+    });
+    gsap.to('.bg-blob-3', {
+      x: 'random(-70, 70)',
+      y: 'random(-70, 70)',
+      duration: 'random(18, 22)',
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
     });
     
   }, [user]);
@@ -402,94 +402,111 @@ export default function Dashboard() {
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
     return (
-      <div className="calendar-card bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 dark:border-gray-700/50 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+      <div className="calendar-card bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
         {/* Calendar Header */}
-        <div className="flex justify-between items-center p-6 bg-gradient-to-r from-emerald-600 to-green-500 dark:from-emerald-900 dark:to-emerald-800 text-white">
-          <div className="flex items-center gap-4">
-            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-              <h2 className="text-2xl font-bold capitalize tracking-tight">
+        <div className="flex justify-between items-center p-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500 dark:from-emerald-900 dark:via-emerald-800 dark:to-green-900 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+          <div className="flex items-center gap-6 relative z-10">
+            <div className="p-3 bg-white/20 rounded-[1.5rem] backdrop-blur-md border border-white/30 shadow-inner">
+              <h2 className="text-3xl font-extrabold capitalize tracking-tight leading-none mb-1">
                 {format(currentDate, 'MMMM', { locale: es })}
               </h2>
-              <span className="text-emerald-100 text-sm font-medium tracking-widest uppercase">
+              <span className="text-emerald-100/80 text-sm font-bold tracking-[0.2em] uppercase">
                 {format(currentDate, 'yyyy', { locale: es })}
               </span>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button onClick={handlePrevMonth} className="p-2.5 hover:bg-white/20 rounded-xl transition-all active:scale-95 backdrop-blur-sm">
-              <ChevronLeft size={24} />
+          <div className="flex gap-3 relative z-10">
+            <button onClick={handlePrevMonth} className="p-3 hover:bg-white/20 rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
+              <ChevronLeft size={28} className="group-hover:-translate-x-0.5 transition-transform" />
             </button>
-            <button onClick={handleNextMonth} className="p-2.5 hover:bg-white/20 rounded-xl transition-all active:scale-95 backdrop-blur-sm">
-              <ChevronRight size={24} />
+            <button onClick={handleNextMonth} className="p-3 hover:bg-white/20 rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
+              <ChevronRight size={28} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>
-        
-        {/* Days Header */}
-        <div className="grid grid-cols-7 text-center bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
-          {weekDays.map(day => (
-            <div key={day} className="py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-              {day}
-            </div>
-          ))}
-        </div>
 
-        {/* Calendar Grid */}
-        <div className="calendar-grid-content grid grid-cols-7 bg-gray-50/30 dark:bg-gray-900/30">
-          {days.map((day) => {
-            const isCurrentMonth = isSameMonth(day, monthStart);
-            const isToday = isSameDay(day, new Date());
-            const dayTasks = tasks.filter(task => isSameDay(new Date(task.due_date), day));
-            
-            return (
-              <div
-                key={day.toString()}
-                onClick={() => onDateClick(day)}
-                className={`
-                  min-h-[140px] p-3 border-b border-r border-gray-100/50 dark:border-gray-700/50 transition-all cursor-pointer group relative
-                  ${!isCurrentMonth ? 'bg-gray-50/50 dark:bg-gray-900/50 text-gray-300 dark:text-gray-600' : 'bg-white dark:bg-gray-800 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10'}
-                  ${isToday ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : ''}
-                `}
-              >
-                <div className={`
-                  flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium mb-2 transition-all
-                  ${isToday ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-emerald-900/40' : 'group-hover:bg-gray-100 dark:group-hover:bg-gray-700 text-gray-600 dark:text-gray-400'}
-                `}>
-                  {format(day, 'd')}
+        <div className="p-8 bg-white/50 dark:bg-gray-800/50">
+          <div className="calendar-grid-content">
+            {/* Weekdays */}
+            <div className="grid grid-cols-7 gap-4 mb-6">
+              {weekDays.map((day) => (
+                <div key={day} className="text-center text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                  {day}
                 </div>
+              ))}
+            </div>
+
+            {/* Days Grid */}
+            <div className="grid grid-cols-7 gap-4">
+              {days.map((day, idx) => {
+                const isCurrentMonth = isSameMonth(day, monthStart);
+                const isToday = isSameDay(day, new Date());
+                const dayTasks = tasks.filter(task => isSameDay(new Date(task.due_date), day));
                 
-                <div className="space-y-1.5 overflow-y-auto max-h-[90px] pr-1 custom-scrollbar">
-                  {dayTasks.map(task => (
-                    <div 
-                      key={task.id} 
-                      onClick={(e) => handleToggleComplete(e, task)}
-                      className={`
-                        group/task flex items-center gap-2 p-1.5 rounded-lg text-xs border transition-all duration-200
-                        ${task.is_completed 
-                          ? 'bg-gray-100 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-gray-700 decoration-gray-400' 
-                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-600 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-700 hover:-translate-y-0.5'
-                        }
-                      `}
-                    >
-                      <div className={`shrink-0 ${task.is_completed ? 'text-gray-300' : 'text-emerald-500'}`}>
-                        {task.is_completed ? <CheckCircle2 size={12} /> : <Circle size={12} />}
-                      </div>
-                      <span className={`truncate font-medium ${task.is_completed ? 'line-through' : ''}`}>
-                        {task.subject}
+                return (
+                  <div 
+                    key={idx}
+                    onClick={() => onDateClick(day)}
+                    className={`group relative min-h-[140px] p-4 rounded-3xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
+                      !isCurrentMonth 
+                        ? 'bg-gray-50/30 dark:bg-gray-900/10 border-transparent opacity-40' 
+                        : isToday
+                          ? 'bg-emerald-50/50 dark:bg-emerald-900/20 border-emerald-500/50 dark:border-emerald-500/50 shadow-lg shadow-emerald-500/10'
+                          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-xl hover:-translate-y-1'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-3 relative z-10">
+                      <span className={`text-xl font-bold transition-colors ${
+                        isToday 
+                          ? 'text-emerald-600 dark:text-emerald-400' 
+                          : isCurrentMonth 
+                            ? 'text-gray-900 dark:text-white' 
+                            : 'text-gray-400 dark:text-gray-600'
+                      }`}>
+                        {format(day, 'd')}
                       </span>
+                      {dayTasks.length > 0 && (
+                        <span className="flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                      )}
                     </div>
-                  ))}
-                </div>
-                
-                {/* Add indicator on hover */}
-                {isCurrentMonth && (
-                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-400">
-                    <Plus size={16} />
+                    
+                    <div className="space-y-1.5 relative z-10">
+                      {dayTasks.slice(0, 2).map((task) => (
+                        <div 
+                          key={task.id}
+                          onClick={(e) => handleToggleComplete(e, task)}
+                          className={`text-[10px] p-2 rounded-xl border transition-all duration-200 flex items-center gap-2 group/task ${
+                            task.is_completed 
+                              ? 'bg-gray-100/50 dark:bg-gray-700/30 border-transparent text-gray-400 line-through' 
+                              : 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-[1.02]'
+                          }`}
+                        >
+                          {task.is_completed ? <CheckCircle2 size={12} /> : <Circle size={12} className="group-hover/task:scale-110 transition-transform" />}
+                          <span className="truncate">{task.subject}</span>
+                        </div>
+                      ))}
+                      {dayTasks.length > 2 && (
+                        <div className="text-[9px] text-gray-400 dark:text-gray-500 font-bold pl-2">
+                          + {dayTasks.length - 2} más
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Hover indicator gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    {/* Add indicator on hover */}
+                    {isCurrentMonth && (
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-2 group-hover:translate-x-0">
+                        <Plus size={18} />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -507,31 +524,32 @@ export default function Dashboard() {
         <div className="bg-blob absolute top-[40%] left-[40%] w-[15%] h-[15%] bg-amber-100/20 dark:bg-amber-900/10 rounded-full blur-[60px]" />
         
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.05] pointer-events-none" />
+        <div className="absolute inset-0 bg-noise opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent dark:via-black/20 pointer-events-none" />
       </div>
 
       {/* Navbar */}
       <nav ref={headerRef} className="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
+          <div className="flex justify-between items-center h-24">
+            <div className="flex items-center gap-4">
               <div className="relative">
                 {avatarUrl ? (
                   <img 
                     src={avatarUrl} 
                     alt="Profile" 
-                    className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20 border-2 border-white dark:border-gray-700"
+                    className="w-12 h-12 rounded-2xl object-cover shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700 transform hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></div>
               </div>
               <div>
-                <div className="text-sm text-gray-400 dark:text-gray-500 font-medium">Bienvenido</div>
-                <div className="font-bold text-gray-900 dark:text-white text-lg leading-none">
+                <div className="text-base text-gray-400 dark:text-gray-500 font-semibold tracking-wide uppercase">Bienvenido</div>
+                <div className="font-extrabold text-gray-900 dark:text-white text-2xl leading-tight tracking-tight">
                   <TextType 
                     text={[userName]} 
                     typingSpeed={100} 
@@ -601,27 +619,27 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <main className="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="dashboard-control">
-            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
+            <h1 className="text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-3">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500 dark:from-white dark:via-gray-200 dark:to-gray-400">
                 Tu Agenda
               </span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
-              Organiza tus actividades y mantén el control.
+            <p className="text-gray-500 dark:text-gray-400 text-xl font-medium max-w-lg">
+              Organiza tus actividades con precisión y estilo. Todo bajo control.
             </p>
           </div>
           
           <button 
             onClick={() => onDateClick(new Date())}
-            className="dashboard-control group flex items-center gap-3 bg-gray-900 dark:bg-emerald-600 text-white px-7 py-4 rounded-2xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-xl shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 active:scale-95 transform hover:-translate-y-0.5"
+            className="dashboard-control group flex items-center gap-4 bg-gray-900 dark:bg-emerald-600 text-white px-8 py-5 rounded-3xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-500 shadow-2xl shadow-gray-300 dark:shadow-emerald-900/40 hover:shadow-emerald-500/50 active:scale-95 transform hover:-translate-y-1"
           >
-            <div className="bg-white/20 p-1.5 rounded-lg group-hover:bg-white/30 transition-colors">
-              <Plus size={20} className="text-white" />
+            <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-all duration-300 group-hover:rotate-90">
+              <Plus size={24} className="text-white" />
             </div>
-            <span className="font-bold tracking-wide">Nueva Tarea</span>
+            <span className="font-bold text-lg tracking-tight">Nueva Tarea</span>
           </button>
         </div>
 
