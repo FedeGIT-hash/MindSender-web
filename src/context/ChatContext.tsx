@@ -71,13 +71,23 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
           event: 'INSERT',
           schema: 'public',
           table: 'direct_messages',
-          filter: `receiver_id=eq.${user.id}`, // Listen for messages sent TO me
+          // Quitamos el filtro explícito para dejar que RLS maneje la seguridad
+          // y así recibir tanto mensajes enviados como recibidos en tiempo real
         },
         (payload: RealtimePostgresChangesPayload<Message>) => {
-          // Only add if it comes from the active chat user
           const newMessage = payload.new as Message;
-          if (newMessage.sender_id === activeChat) {
-            setMessages((prev) => [...prev, newMessage]);
+          
+          // Verificar si el mensaje pertenece al chat activo
+          // (Ya sea que lo envié yo o me lo enviaron)
+          if (
+            (newMessage.sender_id === activeChat && newMessage.receiver_id === user.id) ||
+            (newMessage.sender_id === user.id && newMessage.receiver_id === activeChat)
+          ) {
+            // Verificar si ya existe para evitar duplicados (por optimistic UI)
+            setMessages((prev) => {
+              if (prev.some(m => m.id === newMessage.id)) return prev;
+              return [...prev, newMessage];
+            });
           }
         }
       )
