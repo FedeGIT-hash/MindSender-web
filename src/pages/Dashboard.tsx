@@ -18,9 +18,11 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2 } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Terminal } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import { useTheme } from '../context/ThemeContext';
+
+import { Link } from 'react-router-dom';
 
 interface Task {
   id: string;
@@ -48,6 +50,7 @@ export default function Dashboard() {
   const [newTask, setNewTask] = useState({ subject: '', description: '', due_time: '12:00' });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
+  const [isDev, setIsDev] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -77,6 +80,7 @@ export default function Dashboard() {
     if (user?.user_metadata) {
       setUserName(user.user_metadata.full_name || user.email?.split('@')[0] || 'Usuario');
       setAvatarUrl(user.user_metadata.avatar_url || null);
+      setIsDev(user.user_metadata.role === 'admin' || user.email === 'lott@mindsender.com'); // Mark as Dev if admin
     }
     
     if (user) {
@@ -617,8 +621,16 @@ export default function Dashboard() {
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></div>
               </div>
               <div>
-                <div className="text-[10px] sm:text-base text-gray-400 dark:text-gray-500 font-semibold tracking-wide uppercase leading-none mb-1">Bienvenido</div>
-                <div className="font-extrabold text-gray-900 dark:text-white text-base sm:text-2xl leading-tight tracking-tight">
+                <div className="text-[10px] sm:text-base text-gray-400 dark:text-gray-500 font-semibold tracking-wide uppercase leading-none mb-1 flex items-center gap-2">
+                  Bienvenido
+                  {isDev && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-[10px] rounded-full border border-violet-200 dark:border-violet-800 font-bold animate-pulse">
+                      <Terminal size={10} />
+                      Dev
+                    </span>
+                  )}
+                </div>
+                <div className="font-extrabold text-gray-900 dark:text-white text-base sm:text-2xl leading-tight tracking-tight flex items-center gap-2">
                   <TextType 
                     text={[userName]} 
                     typingSpeed={100} 
@@ -628,6 +640,7 @@ export default function Dashboard() {
                     className="text-gray-900 dark:text-white"
                     cursorCharacter=""
                   />
+                  {isDev && <ShieldCheck size={20} className="text-violet-500" />}
                 </div>
               </div>
             </div>
@@ -640,6 +653,16 @@ export default function Dashboard() {
               >
                 {theme === 'dark' ? <Sun size={20} className="sm:w-6 sm:h-6" /> : <Moon size={20} className="sm:w-6 sm:h-6" />}
               </button>
+
+              {isDev && (
+                <Link 
+                  to="/admin"
+                  className="p-1.5 sm:p-2 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-xl transition-all duration-300 group"
+                  title="Admin Panel"
+                >
+                  <ShieldCheck size={20} className="sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
+                </Link>
+              )}
 
               <button 
                 onClick={openNotifications}
