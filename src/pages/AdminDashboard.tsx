@@ -164,7 +164,7 @@ export default function AdminDashboard() {
             <section className="bg-gray-900/40 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-2xl">
               <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-violet-900/10 to-transparent">
                 <h2 className="font-bold flex items-center gap-2">
-                  <BarChart3 size={20} className="text-violet-400" />
+                  <BarChart size={20} className="text-violet-400" />
                   Métricas de Actividad
                 </h2>
                 <span className="text-xs text-gray-500 font-mono">LIVE_FEED</span>
