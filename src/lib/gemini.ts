@@ -2,9 +2,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
+// Inicializamos el cliente de Google AI
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-export const model = genAI ? genAI.getGenerativeModel({ model: "gemini-pro" }) : null;
+// CAMBIO CRÍTICO: Usamos 'gemini-1.5-flash' que es el modelo más estable y gratuito
+export const model = genAI ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
 
 export const SYSTEM_INSTRUCTION = "Eres Sender AI (delta 1.0), un asistente virtual inteligente integrado en la aplicación MindSender. Tu objetivo es ayudar a los usuarios a organizar sus tareas, gestionar su tiempo y ser más productivos. Eres amigable, conciso y directo. Siempre respondes en español. Si te preguntan quién eres, di que eres Sender AI (delta 1.0), creado para potenciar la productividad.";
 
