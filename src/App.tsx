@@ -1,6 +1,7 @@
 import { lazy, ReactNode, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ChatProvider } from './context/ChatContext';
 import LoadingSpinner from './components/LoadingSpinner';
 const Register = lazy(() => import('./pages/Register'));
 import Login from './pages/Login';
@@ -20,28 +21,30 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/register"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <Register />
-              </Suspense>
-            }
-          />
-          <Route path="/verify" element={<Verify />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Router>
+      <ChatProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/register"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Register />
+                </Suspense>
+              }
+            />
+            <Route path="/verify" element={<Verify />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </ChatProvider>
     </AuthProvider>
   );
 }

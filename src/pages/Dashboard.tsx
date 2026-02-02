@@ -18,7 +18,9 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, MessageCircle } from 'lucide-react';
+import ChatInterface from '../components/Chat/ChatInterface';
+import { useChat } from '../context/ChatContext';
 
 interface Task {
   id: string;
@@ -34,7 +36,9 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const { friendRequests } = useChat();
   const [newTask, setNewTask] = useState({ subject: '', description: '' });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
@@ -457,6 +461,17 @@ export default function Dashboard() {
             
             <div className="flex items-center gap-2">
               <button 
+                onClick={() => setIsChatOpen(true)}
+                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300 relative"
+                title="Chat"
+              >
+                <MessageCircle size={24} />
+                {friendRequests.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                )}
+              </button>
+
+              <button 
                 onClick={openSettings}
                 className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300"
                 title="Configuración"
@@ -706,6 +721,9 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Chat Interface */}
+      <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }
