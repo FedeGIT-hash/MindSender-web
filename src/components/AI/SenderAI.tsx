@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot, AlertCircle } from 'lucide-react';
 import gsap from 'gsap';
-import { chatSession, hasGeminiKey } from '../../lib/gemini';
+import { groq, hasGroqKey } from '../../lib/groq';
 
 interface SenderAIProps {
   isOpen: boolean;
@@ -20,9 +20,9 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     {
       id: 'welcome',
       role: 'assistant',
-      content: hasGeminiKey 
+      content: hasGroqKey 
         ? 'Hola, soy Sender AI (delta 1.0). ¿En qué puedo ayudarte hoy a organizar tus tareas?'
-        : 'Hola. Para que pueda funcionar, necesito que configures mi "cerebro" (API Key de Gemini). Por favor agrega VITE_GEMINI_API_KEY a tus variables de entorno.',
+        : 'Hola. Para que pueda funcionar, necesito que configures mi "cerebro" (API Key de Groq). Por favor agrega VITE_GROQ_API_KEY a tus variables de entorno.',
       timestamp: new Date()
     }
   ]);
@@ -59,8 +59,8 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     e.preventDefault();
     if (!input.trim() || isTyping) return;
     
-    if (!hasGeminiKey) {
-      setError('Falta la API Key de Gemini. Revisa la configuración.');
+    if (!hasGroqKey) {
+      setError('Falta la API Key de Groq. Revisa la configuración.');
       return;
     }
 
@@ -71,16 +71,35 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsTyping(true);
     setError(null);
 
     try {
-      if (chatSession) {
-        const result = await chatSession.sendMessage(userMessage.content);
-        const response = await result.response;
-        const text = response.text();
+      if (groq) {
+        // Prepare messages for Groq (OpenAI format)
+        const apiMessages = newMessages.map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content
+        }));
+
+        // Add system message at the beginning
+        const fullMessages = [
+            { 
+              role: "system", 
+              content: "Eres Sender AI (delta 1.0), un asistente de productividad para MindSender." 
+            },
+            ...apiMessages
+        ];
+
+        const chatCompletion = await groq.chat.completions.create({
+          messages: fullMessages as any,
+          model: "llama3-8b-8192",
+        });
+
+        const text = chatCompletion.choices[0]?.message?.content || "No pude generar una respuesta.";
         
         const aiMessage: AIMessage = {
           id: (Date.now() + 1).toString(),
@@ -91,10 +110,10 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
 
         setMessages(prev => [...prev, aiMessage]);
       } else {
-        throw new Error("No se pudo iniciar la sesión de chat");
+        throw new Error("No se pudo iniciar la sesión de Groq");
       }
     } catch (err: any) {
-      console.error('Error al conectar con Gemini:', err);
+      console.error('Error al conectar con Groq:', err);
       const errorDetail = err.message || JSON.stringify(err);
       setError(`Error: ${errorDetail}`);
       
