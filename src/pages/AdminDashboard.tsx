@@ -11,7 +11,8 @@ import {
   Server,
   Database,
   BarChart3,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Terminal
 } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { format } from 'date-fns';
