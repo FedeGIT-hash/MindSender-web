@@ -184,7 +184,8 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
               ...currentMessages.map(msg => ({ 
                 role: msg.role === 'assistant' ? 'assistant' : msg.role === 'user' ? 'user' : msg.role, 
                 content: msg.content,
-                ...(msg.tool_call_id && { tool_call_id: msg.tool_call_id })
+                ...(msg.tool_call_id && { tool_call_id: msg.tool_call_id }),
+                ...(msg.tool_calls && { tool_calls: msg.tool_calls })
               })),
               {
                 role: 'assistant',
