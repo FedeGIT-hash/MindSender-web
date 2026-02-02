@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
@@ -46,7 +46,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [friends, setFriends] = useState<any[]>([]);
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   // Fetch initial data
   useEffect(() => {
