@@ -97,6 +97,9 @@ async function checkReminders() {
     };
 
     try {
+      // Add a small delay to prevent hitting rate limits
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       await transporter.sendMail(mailOptions);
       console.log(`Email sent to ${profile.email} for task ${task.id}`);
 

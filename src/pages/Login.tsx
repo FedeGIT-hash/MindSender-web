@@ -61,7 +61,11 @@ export default function Login() {
       if (error) throw error;
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
+      let errorMessage = err.message || 'Error al iniciar sesión';
+      if (errorMessage.includes('Invalid login credentials')) {
+        errorMessage = 'Correo o contraseña incorrectos.';
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -80,7 +80,16 @@ export default function Register() {
         } 
       });
     } catch (err: any) {
-      setError(err.message || 'Error al registrarse');
+      let errorMessage = err.message || 'Error al registrarse';
+      
+      // Translate common Supabase errors
+      if (errorMessage.includes('rate limit')) {
+        errorMessage = 'Demasiados intentos. Por favor espera un momento antes de intentar de nuevo.';
+      } else if (errorMessage.includes('already registered')) {
+        errorMessage = 'Este correo ya está registrado.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
