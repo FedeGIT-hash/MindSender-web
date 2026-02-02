@@ -61,6 +61,17 @@ export default function Dashboard() {
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const fetchTasks = async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('user_id', user.id);
+    
+    if (error) console.error('Error fetching tasks:', error);
+    if (data) setTasks(data);
+  };
+
   useEffect(() => {
     // Get user name and avatar from metadata
     if (user?.user_metadata) {
@@ -69,15 +80,6 @@ export default function Dashboard() {
     }
     
     if (user) {
-      const fetchTasks = async () => {
-        const { data, error } = await supabase
-          .from('tasks')
-          .select('*')
-          .eq('user_id', user.id);
-        
-        if (error) console.error('Error fetching tasks:', error);
-        if (data) setTasks(data);
-      };
       fetchTasks();
     }
 
@@ -1075,7 +1077,11 @@ export default function Dashboard() {
       )}
 
       {/* Sender AI Interface */}
-      <SenderAI isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
+      <SenderAI 
+        isOpen={isAIOpen} 
+        onClose={() => setIsAIOpen(false)} 
+        onTaskAction={fetchTasks}
+      />
     </div>
   );
 }

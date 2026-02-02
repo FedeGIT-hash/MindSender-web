@@ -1,28 +1,34 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot } from 'lucide-react';
 import gsap from 'gsap';
-import { groq, hasGroqKey } from '../../lib/groq';
+import { groq, hasGroqKey, MIND_SENDER_TOOLS } from '../../lib/groq';
 import { SYSTEM_PROMPT } from '../../lib/systemPrompt';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 interface SenderAIProps {
   isOpen: boolean;
   onClose: () => void;
+  onTaskAction?: () => void;
 }
 
 interface AIMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system' | 'tool';
   content: string;
   timestamp: Date;
+  tool_call_id?: string;
+  name?: string;
 }
 
-export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
+export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProps) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<AIMessage[]>([
     {
       id: 'welcome',
       role: 'assistant',
       content: hasGroqKey 
-        ? 'Hola, soy Sender AI (delta 1.0). ¿En qué puedo ayudarte hoy a organizar tus tareas?'
+        ? 'Hola, soy Sender AI (delta 1.0). Puedo ayudarte a gestionar tu agenda. ¿Quieres crear una tarea, ver tu lista o modificar algo?'
         : 'Hola. Para que pueda funcionar, necesito que configures mi "cerebro" (API Key de Groq). Por favor agrega VITE_GROQ_API_KEY a tus variables de entorno.',
       timestamp: new Date()
     }
@@ -46,12 +52,79 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  const handleToolCall = async (toolCall: any) => {
+    const { name, arguments: argsString } = toolCall.function;
+    const args = JSON.parse(argsString);
+    
+    console.log(`AI invocando herramienta: ${name}`, args);
+
+    try {
+      switch (name) {
+        case 'create_task': {
+          const { error } = await supabase.from('tasks').insert([{
+            user_id: user?.id,
+            subject: args.subject,
+            description: args.description,
+            due_date: args.due_date,
+            is_completed: false
+          }]);
+          if (error) throw error;
+          if (onTaskAction) onTaskAction();
+          return `Tarea "${args.subject}" creada con éxito para el ${args.due_date}.`;
+        }
+        
+        case 'list_tasks': {
+          const { data, error } = await supabase
+            .from('tasks')
+            .select('*')
+            .eq('user_id', user?.id)
+            .order('due_date', { ascending: true });
+          if (error) throw error;
+          return JSON.stringify(data);
+        }
+
+        case 'update_task': {
+          const { error } = await supabase
+            .from('tasks')
+            .update({
+              subject: args.subject,
+              description: args.description,
+              due_date: args.due_date,
+              is_completed: args.is_completed
+            })
+            .eq('id', args.id)
+            .eq('user_id', user?.id);
+          if (error) throw error;
+          if (onTaskAction) onTaskAction();
+          return `Tarea actualizada correctamente.`;
+        }
+
+        case 'delete_task': {
+          const { error } = await supabase
+            .from('tasks')
+            .delete()
+            .eq('id', args.id)
+            .eq('user_id', user?.id);
+          if (error) throw error;
+          if (onTaskAction) onTaskAction();
+          return `Tarea eliminada correctamente.`;
+        }
+
+        default:
+          return `Herramienta no encontrada: ${name}`;
+      }
+    } catch (err: any) {
+      console.error(`Error en herramienta ${name}:`, err);
+      return `Error al ejecutar ${name}: ${err.message}`;
+    }
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isTyping) return;
     
     if (!hasGroqKey) {
-      setError('Falta la API Key de Groq. Revisa la configuración en Vercel.');
+      setError('Falta la API Key de Groq. Revisa la configuración.');
       return;
     }
 
@@ -62,50 +135,101 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       timestamp: new Date()
     };
 
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    let currentMessages = [...messages, userMessage];
+    setMessages(currentMessages);
     setInput('');
     setIsTyping(true);
     setError(null);
 
     try {
       if (groq) {
-        const apiMessages = newMessages.map(msg => ({
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content
-        }));
+        const fullSystemPrompt = `${SYSTEM_PROMPT}\nFecha y hora actual: ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}.`;
+        
+        let apiMessages = [
+          { role: "system", content: fullSystemPrompt },
+          ...currentMessages.map(msg => ({
+            role: msg.role === 'assistant' ? 'assistant' : msg.role === 'user' ? 'user' : msg.role,
+            content: msg.content,
+            ...(msg.tool_call_id && { tool_call_id: msg.tool_call_id }),
+            ...(msg.name && { name: msg.name })
+          }))
+        ];
 
-        const chatCompletion = await groq.chat.completions.create({
-          messages: [
-            { 
-              role: "system", 
-              content: SYSTEM_PROMPT 
-            },
-            ...apiMessages
-          ] as any,
-          // CAMBIO CLAVE: Modelo actualizado para evitar el error 400
-          model: "llama-3.1-8b-instant", 
+        const response = await groq.chat.completions.create({
+          messages: apiMessages as any,
+          model: "llama-3.1-8b-instant",
+          tools: MIND_SENDER_TOOLS as any,
+          tool_choice: "auto"
         });
 
-        const text = chatCompletion.choices[0]?.message?.content || "No pude generar una respuesta.";
-        
-        const aiMessage: AIMessage = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: text,
-          timestamp: new Date()
-        };
+        const responseMessage = response.choices[0].message;
 
-        setMessages(prev => [...prev, aiMessage]);
+        if (responseMessage.tool_calls) {
+          const aiMessageWithToolCalls: AIMessage = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: responseMessage.content || "",
+            timestamp: new Date(),
+            tool_call_id: undefined // OpenAI/Groq spec: the message with tool_calls doesn't have a tool_call_id itself
+          };
+          
+          // Groq/OpenAI need the assistant message with tool_calls in the history
+          // We need to store the tool_calls for the next API call
+          const apiMessageWithToolCalls = {
+            role: 'assistant',
+            content: responseMessage.content,
+            tool_calls: responseMessage.tool_calls
+          };
+
+          const toolResults = [];
+          for (const toolCall of responseMessage.tool_calls) {
+            const result = await handleToolCall(toolCall);
+            toolResults.push({
+              role: 'tool',
+              tool_call_id: toolCall.id,
+              name: toolCall.function.name,
+              content: result
+            });
+          }
+
+          // Now call the AI again with the tool results
+          const secondResponse = await groq.chat.completions.create({
+            messages: [
+              { role: "system", content: fullSystemPrompt },
+              ...currentMessages.map(msg => ({ role: msg.role, content: msg.content })),
+              apiMessageWithToolCalls,
+              ...toolResults
+            ] as any,
+            model: "llama-3.1-8b-instant"
+          });
+
+          const finalAiMessage: AIMessage = {
+            id: (Date.now() + 2).toString(),
+            role: 'assistant',
+            content: secondResponse.choices[0].message.content || "He procesado tu solicitud.",
+            timestamp: new Date()
+          };
+
+          setMessages(prev => [...prev, finalAiMessage]);
+        } else {
+          const aiMessage: AIMessage = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: responseMessage.content || "No pude generar una respuesta.",
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        }
       }
     } catch (err: any) {
       const errorDetail = err.message || "Error desconocido";
+      console.error("Error en chat:", err);
       setError(`Error: ${errorDetail}`);
       
       const errorMessage: AIMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `⚠️ Error de conexión: ${errorDetail}. Verifica tu API Key en Vercel.`,
+        content: `⚠️ Error: ${errorDetail}.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
