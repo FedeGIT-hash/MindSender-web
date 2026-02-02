@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, MessageSquare, Send, Sparkles, Bot } from 'lucide-react';
+import { X, Send, Sparkles, Bot } from 'lucide-react';
 import gsap from 'gsap';
 
 interface SenderAIProps {
