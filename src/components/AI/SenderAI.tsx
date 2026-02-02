@@ -53,8 +53,10 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
   }, [messages, isTyping]);
 
   const handleToolCall = async (toolCall: any) => {
+    if (!toolCall?.function) return "Error: No se proporcionó una función válida.";
+    
     const { name, arguments: argsString } = toolCall.function;
-    const args = JSON.parse(argsString);
+    const args = JSON.parse(argsString || '{}');
     
     console.log(`AI invocando herramienta: ${name}`, args);
 
@@ -182,14 +184,16 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
           };
 
           const toolResults = [];
-          for (const toolCall of responseMessage.tool_calls) {
-            const result = await handleToolCall(toolCall);
-            toolResults.push({
-              role: 'tool',
-              tool_call_id: toolCall.id,
-              name: toolCall.function.name,
-              content: result
-            });
+          if (responseMessage.tool_calls) {
+            for (const toolCall of responseMessage.tool_calls) {
+              const result = await handleToolCall(toolCall);
+              toolResults.push({
+                role: 'tool' as const,
+                tool_call_id: toolCall.id,
+                name: toolCall.function?.name || 'unknown',
+                content: result
+              });
+            }
           }
 
           // Now call the AI again with the tool results
