@@ -93,14 +93,15 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
       } else {
         throw new Error("No se pudo iniciar la sesión de chat");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al conectar con Gemini:', err);
-      setError('Lo siento, tuve un problema al procesar tu mensaje. Intenta de nuevo.');
+      const errorDetail = err.message || JSON.stringify(err);
+      setError(`Error: ${errorDetail}`);
       
       const errorMessage: AIMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '⚠️ Error de conexión. Por favor verifica tu internet o la API Key.',
+        content: `⚠️ Error de conexión: ${errorDetail}. Por favor verifica tu internet o la API Key.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
