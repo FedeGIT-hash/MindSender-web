@@ -455,13 +455,23 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <button 
-              onClick={signOut}
-              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all duration-300 font-medium"
-            >
-              <span className="hidden sm:inline">Cerrar Sesión</span>
-              <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={openSettings}
+                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300"
+                title="Configuración"
+              >
+                <Settings size={24} />
+              </button>
+
+              <button 
+                onClick={signOut}
+                className="group flex items-center gap-2 px-4 py-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all duration-300 font-medium"
+              >
+                <span className="hidden sm:inline">Cerrar Sesión</span>
+                <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -487,11 +497,6 @@ export default function Dashboard() {
             </div>
             <span className="font-semibold">Nueva Tarea</span>
           </button>
-        </div>
-
-        {renderCalendar()}
-      </main>
-
         </div>
 
         {renderCalendar()}
