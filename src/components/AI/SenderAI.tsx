@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, Sparkles, Bot } from 'lucide-react';
+import { X, Send, Sparkles, Bot, AlertCircle } from 'lucide-react';
 import gsap from 'gsap';
+import { chatSession, hasGeminiKey } from '../../lib/gemini';
 
 interface SenderAIProps {
   isOpen: boolean;
@@ -19,12 +20,15 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     {
       id: 'welcome',
       role: 'assistant',
-      content: 'Hola, soy Sender AI (delta 1.0). ¿En qué puedo ayudarte hoy a organizar tus tareas?',
+      content: hasGeminiKey 
+        ? 'Hola, soy Sender AI (delta 1.0). ¿En qué puedo ayudarte hoy a organizar tus tareas?'
+        : 'Hola. Para que pueda funcionar, necesito que configures mi "cerebro" (API Key de Gemini). Por favor agrega VITE_GEMINI_API_KEY a tus variables de entorno.',
       timestamp: new Date()
     }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,7 +57,12 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
+    
+    if (!hasGeminiKey) {
+      setError('Falta la API Key de Gemini. Revisa la configuración.');
+      return;
+    }
 
     const userMessage: AIMessage = {
       id: Date.now().toString(),
@@ -65,29 +74,39 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
+    setError(null);
 
-    // Simulate AI processing time
-    setTimeout(() => {
-      const responses = [
-        "Entendido, puedo ayudarte con eso.",
-        "Interesante punto. ¿Podrías darme más detalles?",
-        "He registrado esa información.",
-        "Estoy procesando tu solicitud... delta 1.0 está aprendiendo.",
-        "Como asistente virtual, mi objetivo es optimizar tu flujo de trabajo."
-      ];
+    try {
+      if (chatSession) {
+        const result = await chatSession.sendMessage(userMessage.content);
+        const response = await result.response;
+        const text = response.text();
+        
+        const aiMessage: AIMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: text,
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+      } else {
+        throw new Error("No se pudo iniciar la sesión de chat");
+      }
+    } catch (err) {
+      console.error('Error al conectar con Gemini:', err);
+      setError('Lo siento, tuve un problema al procesar tu mensaje. Intenta de nuevo.');
       
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      const aiMessage: AIMessage = {
+      const errorMessage: AIMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: randomResponse,
+        content: '⚠️ Error de conexión. Por favor verifica tu internet o la API Key.',
         timestamp: new Date()
       };
-
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -119,6 +138,13 @@ export default function SenderAI({ isOpen, onClose }: SenderAIProps) {
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+        {error && (
+          <div className="bg-red-50 border border-red-100 text-red-600 p-3 rounded-xl flex items-center gap-2 text-sm">
+            <AlertCircle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
+        
         {messages.map((msg) => (
           <div 
             key={msg.id} 
