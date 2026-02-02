@@ -1,12 +1,12 @@
-import React from 'react';
+import { lazy, ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Register from './pages/Register';
+const Register = lazy(() => import('./pages/Register'));
 import Login from './pages/Login';
 import Verify from './pages/Verify';
 import Dashboard from './pages/Dashboard';
 
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+const PrivateRoute = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
   
   if (loading) {

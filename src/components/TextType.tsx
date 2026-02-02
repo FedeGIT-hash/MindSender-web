@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useState, createElement, useMemo, useCallback, FC, ElementType } from 'react';
 import gsap from 'gsap';
 import './TextType.css';
 
 interface TextTypeProps {
   text: string | string[];
-  as?: React.ElementType;
+  as?: ElementType;
   typingSpeed?: number;
   initialDelay?: number;
   pauseDuration?: number;
@@ -23,7 +23,7 @@ interface TextTypeProps {
   reverseMode?: boolean;
 }
 
-const TextType: React.FC<TextTypeProps> = ({
+const TextType: FC<TextTypeProps> = ({
   text,
   as: Component = 'div',
   typingSpeed = 50,

@@ -18,7 +18,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle } from 'lucide-react';
 
 interface Task {
   id: string;
@@ -41,6 +41,7 @@ export default function Dashboard() {
   const modalRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Get user name from metadata or profile
@@ -63,21 +64,55 @@ export default function Dashboard() {
       fetchTasks();
     }
 
-    // Header animation
-    gsap.fromTo(headerRef.current, 
-      { y: -50, opacity: 0 }, 
-      { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }
+    // Header animation with improved staggering
+    const tl = gsap.timeline();
+    
+    tl.fromTo(headerRef.current, 
+      { y: -20, opacity: 0 }, 
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+    )
+    .fromTo('.dashboard-control',
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power3.out' },
+      '-=0.4'
+    )
+    .fromTo('.calendar-card', 
+      { scale: 0.95, opacity: 0 }, 
+      { scale: 1, opacity: 1, duration: 0.8, ease: 'power3.out' },
+      '-=0.4'
     );
-
-    // Main content animation
-    gsap.fromTo('.dashboard-main', 
-      { opacity: 0, y: 20 }, 
-      { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power3.out' }
-    );
+    
   }, [user]);
 
-  const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-  const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+  const handlePrevMonth = () => {
+    gsap.to('.calendar-grid-content', {
+      x: 20,
+      opacity: 0,
+      duration: 0.2,
+      onComplete: () => {
+        setCurrentDate(subMonths(currentDate, 1));
+        gsap.fromTo('.calendar-grid-content',
+          { x: -20, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }
+        );
+      }
+    });
+  };
+
+  const handleNextMonth = () => {
+    gsap.to('.calendar-grid-content', {
+      x: -20,
+      opacity: 0,
+      duration: 0.2,
+      onComplete: () => {
+        setCurrentDate(addMonths(currentDate, 1));
+        gsap.fromTo('.calendar-grid-content',
+          { x: 20, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }
+        );
+      }
+    });
+  };
 
   const onDateClick = (date: Date) => {
     setSelectedDate(date);
@@ -86,14 +121,20 @@ export default function Dashboard() {
 
   const openModal = () => {
     setIsModalOpen(true);
-    // Animation for modal
+    // Refined animation for modal
     setTimeout(() => {
       if (modalRef.current && overlayRef.current) {
-        gsap.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-        gsap.fromTo(modalRef.current, 
-          { scale: 0.5, opacity: 0, rotation: -10 }, 
-          { scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }
-        );
+        gsap.set(modalRef.current, { scale: 0.9, opacity: 0, y: 20 });
+        gsap.set(overlayRef.current, { opacity: 0 });
+        
+        gsap.to(overlayRef.current, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+        gsap.to(modalRef.current, { 
+          scale: 1, 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.4, 
+          ease: 'back.out(1.2)' 
+        });
       }
     }, 10);
   };
@@ -101,14 +142,14 @@ export default function Dashboard() {
   const closeModal = () => {
     if (modalRef.current && overlayRef.current) {
       gsap.to(modalRef.current, { 
-        scale: 0.5, 
+        scale: 0.95, 
         opacity: 0, 
-        rotation: 10, 
-        duration: 0.3, 
-        ease: 'power3.in',
+        y: 10,
+        duration: 0.2, 
+        ease: 'power2.in',
         onComplete: () => setIsModalOpen(false)
       });
-      gsap.to(overlayRef.current, { opacity: 0, duration: 0.3 });
+      gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, delay: 0.1 });
     }
   };
 
@@ -184,28 +225,40 @@ export default function Dashboard() {
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
     return (
-      <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-        <div className="flex justify-between items-center p-4 bg-green-600 text-white">
-          <button onClick={handlePrevMonth} className="p-2 hover:bg-green-700 rounded-full">
-            <ChevronLeft />
-          </button>
-          <h2 className="text-xl font-bold capitalize">
-            {format(currentDate, 'MMMM yyyy', { locale: es })}
-          </h2>
-          <button onClick={handleNextMonth} className="p-2 hover:bg-green-700 rounded-full">
-            <ChevronRight />
-          </button>
+      <div className="calendar-card bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+        {/* Calendar Header */}
+        <div className="flex justify-between items-center p-6 bg-gradient-to-r from-emerald-600 to-green-500 text-white">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+              <h2 className="text-2xl font-bold capitalize tracking-tight">
+                {format(currentDate, 'MMMM', { locale: es })}
+              </h2>
+              <span className="text-emerald-100 text-sm font-medium tracking-widest uppercase">
+                {format(currentDate, 'yyyy', { locale: es })}
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handlePrevMonth} className="p-2.5 hover:bg-white/20 rounded-xl transition-all active:scale-95 backdrop-blur-sm">
+              <ChevronLeft size={24} />
+            </button>
+            <button onClick={handleNextMonth} className="p-2.5 hover:bg-white/20 rounded-xl transition-all active:scale-95 backdrop-blur-sm">
+              <ChevronRight size={24} />
+            </button>
+          </div>
         </div>
         
-        <div className="grid grid-cols-7 text-center bg-green-50 border-b border-green-100">
+        {/* Days Header */}
+        <div className="grid grid-cols-7 text-center bg-gray-50/50 border-b border-gray-100">
           {weekDays.map(day => (
-            <div key={day} className="py-2 font-semibold text-green-800">
+            <div key={day} className="py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
               {day}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7">
+        {/* Calendar Grid */}
+        <div className="calendar-grid-content grid grid-cols-7 bg-gray-50/30">
           {days.map((day) => {
             const isCurrentMonth = isSameMonth(day, monthStart);
             const isToday = isSameDay(day, new Date());
@@ -216,24 +269,47 @@ export default function Dashboard() {
                 key={day.toString()}
                 onClick={() => onDateClick(day)}
                 className={`
-                  min-h-[100px] p-2 border border-gray-100 transition-all cursor-pointer hover:bg-green-50
-                  ${!isCurrentMonth ? 'bg-gray-50 text-gray-400' : 'bg-white'}
-                  ${isToday ? 'bg-green-100 font-bold text-green-700' : ''}
+                  min-h-[140px] p-3 border-b border-r border-gray-100/50 transition-all cursor-pointer group relative
+                  ${!isCurrentMonth ? 'bg-gray-50/50 text-gray-300' : 'bg-white hover:bg-emerald-50/30'}
+                  ${isToday ? 'bg-emerald-50/50' : ''}
                 `}
               >
-                <div className="text-right text-sm mb-1">{format(day, 'd')}</div>
-                <div className="space-y-1">
+                <div className={`
+                  flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium mb-2 transition-all
+                  ${isToday ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'group-hover:bg-gray-100 text-gray-600'}
+                `}>
+                  {format(day, 'd')}
+                </div>
+                
+                <div className="space-y-1.5 overflow-y-auto max-h-[90px] pr-1 custom-scrollbar">
                   {dayTasks.map(task => (
                     <div 
                       key={task.id} 
                       onClick={(e) => handleToggleComplete(e, task)}
-                      className={`text-xs p-1 rounded truncate cursor-pointer hover:opacity-80 transition-opacity ${task.is_completed ? 'bg-gray-200 text-gray-500 line-through' : 'bg-green-100 text-green-700'}`}
-                      title="Click para marcar como completada/pendiente"
+                      className={`
+                        group/task flex items-center gap-2 p-1.5 rounded-lg text-xs border transition-all duration-200
+                        ${task.is_completed 
+                          ? 'bg-gray-100 text-gray-400 border-gray-100 decoration-gray-400' 
+                          : 'bg-white text-gray-700 border-gray-100 shadow-sm hover:shadow-md hover:border-emerald-200 hover:-translate-y-0.5'
+                        }
+                      `}
                     >
-                      {task.subject}
+                      <div className={`shrink-0 ${task.is_completed ? 'text-gray-300' : 'text-emerald-500'}`}>
+                        {task.is_completed ? <CheckCircle2 size={12} /> : <Circle size={12} />}
+                      </div>
+                      <span className={`truncate font-medium ${task.is_completed ? 'line-through' : ''}`}>
+                        {task.subject}
+                      </span>
                     </div>
                   ))}
                 </div>
+                
+                {/* Add indicator on hover */}
+                {isCurrentMonth && (
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-400">
+                    <Plus size={16} />
+                  </div>
+                )}
               </div>
             );
           })}
@@ -243,113 +319,155 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header ref={headerRef} className="bg-white shadow-md p-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <TextType 
-                text={[`Hola bienvenido ${userName}`, `Es un gusto verte ${userName}`]} 
-                typingSpeed={100} 
-                deletingSpeed={50} 
-                pauseDuration={2000} 
-                loop={true}
-                className="text-green-600"
-                cursorCharacter="|"
-              />
-            </h1>
+    <div ref={containerRef} className="min-h-screen bg-gray-50 font-sans selection:bg-emerald-100 selection:text-emerald-900">
+      {/* Navbar */}
+      <nav ref={headerRef} className="fixed top-0 w-full z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-200">
+                M
+              </div>
+              <div>
+                <div className="text-sm text-gray-400 font-medium">Bienvenido</div>
+                <div className="font-bold text-gray-900 text-lg leading-none">
+                  <TextType 
+                    text={[userName]} 
+                    typingSpeed={100} 
+                    deletingSpeed={50} 
+                    pauseDuration={5000} 
+                    loop={false}
+                    className="text-gray-900"
+                    cursorCharacter=""
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={signOut}
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all duration-300 font-medium"
+            >
+              <span className="hidden sm:inline">Cerrar Sesión</span>
+              <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
-          <button 
-            onClick={signOut}
-            className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
-          >
-            <LogOut size={20} />
-            <span className="hidden sm:inline">Cerrar Sesión</span>
-          </button>
         </div>
-      </header>
+      </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-4 mt-6">
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-700">Tu Planificador</h2>
+      <main className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="dashboard-control">
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
+              Tu Agenda
+            </h1>
+            <p className="text-gray-500 text-lg">
+              Organiza tus actividades y mantén el control.
+            </p>
+          </div>
+          
           <button 
             onClick={() => onDateClick(new Date())}
-            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-lg hover:shadow-green-500/30"
+            className="dashboard-control group flex items-center gap-2 bg-gray-900 text-white px-6 py-3.5 rounded-2xl hover:bg-emerald-600 transition-all duration-300 shadow-xl hover:shadow-emerald-500/30 active:scale-95"
           >
-            <Plus size={20} />
-            Nueva Tarea
+            <div className="bg-white/20 p-1 rounded-lg group-hover:bg-white/30 transition-colors">
+              <Plus size={20} />
+            </div>
+            <span className="font-semibold">Nueva Tarea</span>
           </button>
         </div>
 
         {renderCalendar()}
       </main>
 
-      {/* Modal */}
+      {/* Modern Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
             ref={overlayRef}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"
             onClick={closeModal}
           ></div>
           <div 
             ref={modalRef}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10"
+            className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-100"
           >
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              Nueva Tarea
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Para el {selectedDate && format(selectedDate, "d 'de' MMMM, yyyy", { locale: es })}
-            </p>
+            <div className="absolute top-6 right-6">
+              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors">
+                <Plus size={24} className="rotate-45" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddTask} className="space-y-4">
-              <div>
-                <label className="block text-gray-700 mb-2 font-medium">Materia</label>
-                <div className="relative">
-                  <BookOpen className="absolute left-3 top-3 text-green-500" size={20} />
+            <div className="mb-8">
+              <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold tracking-wide uppercase mb-3">
+                Nueva Entrada
+              </span>
+              <h3 className="text-3xl font-bold text-gray-900">
+                Crear Tarea
+              </h3>
+              <p className="text-gray-500 mt-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: es })}
+              </p>
+            </div>
+
+            <form onSubmit={handleAddTask} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Materia / Asignatura</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <BookOpen className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                  </div>
                   <input
                     type="text"
                     required
-                    placeholder="Ej. Matemáticas"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50"
+                    placeholder="Ej. Matemáticas Avanzadas"
+                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 text-gray-900 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400"
                     value={newTask.subject}
                     onChange={(e) => setNewTask({ ...newTask, subject: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 mb-2 font-medium">Tarea / Descripción</label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-3 text-green-500" size={20} />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Descripción</label>
+                <div className="relative group">
+                  <div className="absolute top-4 left-4 pointer-events-none">
+                    <FileText className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                  </div>
                   <textarea
                     required
-                    placeholder="Detalles de la tarea..."
-                    rows={3}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50"
+                    placeholder="¿Qué necesitas realizar?"
+                    rows={4}
+                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 text-gray-900 rounded-2xl focus:bg-white focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 resize-none"
                     value={newTask.description}
                     onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-4 pt-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-6 py-4 rounded-2xl border-2 border-gray-100 text-gray-600 font-bold hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-all shadow-lg shadow-green-200"
+                  className="flex-1 px-6 py-4 rounded-2xl bg-gray-900 text-white font-bold hover:bg-emerald-600 transition-all duration-300 shadow-lg shadow-gray-200 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Guardando...' : 'Guardar Tarea'}
+                  {loading ? (
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Guardar</span>
+                      <ChevronRight size={18} />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
