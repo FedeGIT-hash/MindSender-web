@@ -190,7 +190,6 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
               toolResults.push({
                 role: 'tool' as const,
                 tool_call_id: toolCall.id,
-                name: toolCall.function?.name || 'unknown',
                 content: result
               });
             }
