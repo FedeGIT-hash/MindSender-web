@@ -1,7 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Sparkles, Bot } from 'lucide-react';
+import { X, Send, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 import { groq, hasGroqKey, MIND_SENDER_TOOLS } from '../../lib/groq';
+
+// Gemini-style Logo Component
+const GeminiLogo = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path 
+      d="M16 3C16.5 9.5 20.5 13.5 26 14C20.5 14.5 16.5 18.5 16 25C15.5 18.5 11.5 14.5 6 14C11.5 13.5 15.5 9.5 16 3Z" 
+      fill="url(#gemini-gradient)"
+      transform="scale(0.8) translate(1, 1)"
+    />
+    <path 
+      d="M8 3C8.5 6.5 10.5 8.5 14 9C10.5 9.5 8.5 11.5 8 15C7.5 11.5 5.5 9.5 2 9C5.5 8.5 7.5 6.5 8 3Z" 
+      fill="url(#gemini-gradient)"
+      transform="translate(0, 10)"
+      opacity="0.7"
+    />
+    <defs>
+      <linearGradient id="gemini-gradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#3B82F6" />
+        <stop offset="50%" stopColor="#8B5CF6" />
+        <stop offset="100%" stopColor="#EC4899" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
 import { SYSTEM_PROMPT } from '../../lib/systemPrompt';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
@@ -238,20 +267,34 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
       className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50 border-l border-white/20 dark:border-gray-800 transform translate-x-full flex flex-col"
     >
       {/* Header */}
-      <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gradient-to-r from-violet-50 to-white dark:from-violet-900/20 dark:to-gray-900">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="p-1.5 sm:p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
-            <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-violet-600 dark:text-violet-400" />
+      <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 blur-xl rounded-full" />
+            <div className="relative p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <GeminiLogo className="w-6 h-6" />
+            </div>
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white">Sender AI</h2>
-            <span className="text-[9px] sm:text-[10px] font-mono bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded border border-violet-200 dark:border-violet-800">
-              delta 1.0 (Groq)
-            </span>
+            <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-200 dark:to-white">
+              Sender AI
+            </h2>
+            <div className="flex items-center gap-1.5">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                Powered by Groq
+              </span>
+            </div>
           </div>
         </div>
-        <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-          <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+        <button 
+          onClick={onClose} 
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors group"
+        >
+          <X className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300 transition-colors" />
         </button>
       </div>
 
