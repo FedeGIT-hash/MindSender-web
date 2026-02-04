@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import gsap from 'gsap';
-import { Mail, Lock, User, Calendar, Activity, Eye, EyeOff, Check, X } from 'lucide-react';
+import { Mail, Lock, User, Calendar, Activity, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function Register() {
