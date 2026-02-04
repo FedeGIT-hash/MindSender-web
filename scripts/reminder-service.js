@@ -1,6 +1,13 @@
-require('dotenv').config({ path: '../.env' });
-const { createClient } = require('@supabase/supabase-js');
-const nodemailer = require('nodemailer');
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Load env vars ensuring we find the file from the project root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: join(__dirname, '../.env') });
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -26,29 +33,21 @@ const transporter = nodemailer.createTransport({
 async function checkReminders() {
   console.log('Checking for reminders...', new Date().toISOString());
 
-  // Calculate time range: 4 hours from now
+  // Calculate time range: 2 to 3 hours from now (checking slightly wider window to be safe)
   const now = new Date();
-  const fourHoursLater = new Date(now.getTime() + 4 * 60 * 60 * 1000);
   
-  // Look for tasks due within the next 4 hours + 15 mins buffer, that haven't been reminded
-  // We check if due_date <= 4 hours from now AND reminder_sent is false
-  // But we don't want to send reminders for tasks that are already overdue by a lot?
-  // User said "4 hours before".
-  // So we look for tasks where due_date is approximately 4 hours from now.
-  // Let's say between 3.5 and 4.5 hours from now.
+  // Look for tasks due between 2 hours and 3.5 hours from now
+  // This ensures that if the cron runs every hour, we catch everything.
+  // Example: 
+  // Run at 10:00 -> checks 12:00 to 13:30
+  // Run at 11:00 -> checks 13:00 to 14:30
   
-  const minTime = new Date(now.getTime() + 3.5 * 60 * 60 * 1000);
-  const maxTime = new Date(now.getTime() + 4.5 * 60 * 60 * 1000);
+  const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  const maxTime = new Date(now.getTime() + 3.5 * 60 * 60 * 1000);
 
   const { data: tasks, error } = await supabase
     .from('tasks')
-    .select(`
-      *,
-      profiles (
-        email,
-        full_name
-      )
-    `)
+    .select('*')
     .eq('reminder_sent', false)
     .gte('due_date', minTime.toISOString())
     .lte('due_date', maxTime.toISOString());
@@ -58,15 +57,33 @@ async function checkReminders() {
     return;
   }
 
-  if (tasks.length === 0) {
+  if (!tasks || tasks.length === 0) {
     console.log('No reminders to send.');
     return;
   }
 
   console.log(`Found ${tasks.length} tasks to remind.`);
 
+  // Manually fetch profiles to avoid Foreign Key issues in Supabase
+  const userIds = [...new Set(tasks.map(t => t.user_id))];
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, email, full_name')
+    .in('id', userIds);
+
+  if (profilesError) {
+    console.error('Error fetching profiles:', profilesError);
+    return;
+  }
+
+  // Create a map for quick lookup
+  const profilesMap = profiles.reduce((acc, profile) => {
+    acc[profile.id] = profile;
+    return acc;
+  }, {});
+
   for (const task of tasks) {
-    const profile = task.profiles;
+    const profile = profilesMap[task.user_id];
     if (!profile || !profile.email) continue;
 
     const mailOptions = {
@@ -76,7 +93,7 @@ async function checkReminders() {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #7c3aed;">Hola ${profile.full_name || 'Usuario'}</h2>
-          <p>Tienes una tarea pendiente en 4 horas:</p>
+          <p>Tienes una tarea que vence pronto (en 2-3 horas):</p>
           
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin: 0 0 10px 0; color: #1f2937;">${task.subject}</h3>
