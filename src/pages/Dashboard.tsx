@@ -83,6 +83,8 @@ export default function Dashboard() {
   const headerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addTaskBtnRef = useRef<HTMLButtonElement>(null);
+  const [animatingFromButton, setAnimatingFromButton] = useState(false);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -250,36 +252,103 @@ export default function Dashboard() {
     // Refined animation for modal
     setTimeout(() => {
       if (modalRef.current && overlayRef.current) {
-        gsap.set(modalRef.current, { scale: 0.9, opacity: 0, y: 20 });
-        gsap.set(overlayRef.current, { opacity: 0 });
-        
-        gsap.to(overlayRef.current, { opacity: 1, duration: 0.3, ease: 'power2.out' });
-        gsap.to(modalRef.current, { 
-          scale: 1, 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.4, 
-          ease: 'back.out(1.2)' 
-        });
+        if (animatingFromButton && addTaskBtnRef.current) {
+          const btnRect = addTaskBtnRef.current.getBoundingClientRect();
+          
+          // Initial state: match button
+          gsap.set(modalRef.current, {
+            position: 'fixed',
+            left: btnRect.left,
+            top: btnRect.top,
+            width: btnRect.width,
+            height: btnRect.height,
+            borderRadius: '2rem',
+            opacity: 1,
+            scale: 1,
+            x: 0,
+            y: 0,
+            margin: 0,
+            transformOrigin: 'center center'
+          });
+          
+          gsap.set(overlayRef.current, { opacity: 0 });
+          
+          const tl = gsap.timeline({ defaults: { ease: 'power4.inOut' } });
+          
+          tl.to(overlayRef.current, { opacity: 1, duration: 0.4 })
+            .to(modalRef.current, {
+              left: '50%',
+              top: '50%',
+              xPercent: -50,
+              yPercent: -50,
+              width: '100%',
+              maxWidth: '28rem', // max-w-md
+              height: 'auto',
+              borderRadius: '2.5rem',
+              duration: 0.5
+            }, '<');
+            
+        } else {
+          gsap.set(modalRef.current, { scale: 0.9, opacity: 0, y: 20 });
+          gsap.set(overlayRef.current, { opacity: 0 });
+          
+          gsap.to(overlayRef.current, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+          gsap.to(modalRef.current, { 
+            scale: 1, 
+            opacity: 1, 
+            y: 0, 
+            duration: 0.4, 
+            ease: 'back.out(1.2)' 
+          });
+        }
       }
     }, 10);
   };
 
   const closeModal = () => {
     if (modalRef.current && overlayRef.current) {
-      gsap.to(modalRef.current, { 
-        scale: 0.95, 
-        opacity: 0, 
-        y: 10,
-        duration: 0.2, 
-        ease: 'power2.in',
-        onComplete: () => {
-          setIsModalOpen(false);
-          setEditingTask(null);
-          setNewTask({ subject: '', description: '', due_time: '12:00' });
-        }
-      });
-      gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, delay: 0.1 });
+      if (animatingFromButton && addTaskBtnRef.current) {
+        const btnRect = addTaskBtnRef.current.getBoundingClientRect();
+        
+        const tl = gsap.timeline({ 
+          onComplete: () => {
+            setIsModalOpen(false);
+            setEditingTask(null);
+            setNewTask({ subject: '', description: '', due_time: '12:00' });
+            setAnimatingFromButton(false);
+          }
+        });
+
+        tl.to(modalRef.current, {
+          left: btnRect.left,
+          top: btnRect.top,
+          xPercent: 0,
+          yPercent: 0,
+          width: btnRect.width,
+          height: btnRect.height,
+          borderRadius: '2rem',
+          overflow: 'hidden', // Prevent content from spilling
+          opacity: 0, // Fade out slightly at end to smooth transition back to button
+          duration: 0.4,
+          ease: 'power4.inOut'
+        })
+        .to(overlayRef.current, { opacity: 0, duration: 0.3 }, '<0.1');
+        
+      } else {
+        gsap.to(modalRef.current, { 
+          scale: 0.95, 
+          opacity: 0, 
+          y: 10,
+          duration: 0.2, 
+          ease: 'power2.in',
+          onComplete: () => {
+            setIsModalOpen(false);
+            setEditingTask(null);
+            setNewTask({ subject: '', description: '', due_time: '12:00' });
+          }
+        });
+        gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, delay: 0.1 });
+      }
     }
   };
 
@@ -737,16 +806,6 @@ export default function Dashboard() {
               Organiza tus actividades con precisión y estilo.
             </p>
           </div>
-          
-          <button 
-            onClick={() => onDateClick(new Date())}
-            className="dashboard-control group flex items-center justify-center gap-3 sm:gap-4 bg-gray-900 dark:bg-emerald-600 text-white px-6 py-4 sm:px-8 sm:py-5 rounded-2xl sm:rounded-3xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-500 shadow-2xl shadow-gray-300 dark:shadow-emerald-900/40 hover:shadow-emerald-500/50 active:scale-95 transform hover:-translate-y-1"
-          >
-            <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg sm:rounded-xl group-hover:bg-white/30 transition-all duration-300 group-hover:rotate-90">
-              <Plus size={20} className="sm:w-6 sm:h-6 text-white" />
-            </div>
-            <span className="font-bold text-base sm:text-lg tracking-tight">Nueva Tarea</span>
-          </button>
         </div>
 
         {/* Bento Grid Dashboard */}
@@ -840,7 +899,11 @@ export default function Dashboard() {
           
            {/* Add Task Quick Button */}
            <button 
-            onClick={() => onDateClick(new Date())}
+            ref={addTaskBtnRef}
+            onClick={() => {
+              setAnimatingFromButton(true);
+              onDateClick(new Date());
+            }}
             className="bg-gray-900 dark:bg-emerald-600 text-white p-6 rounded-[2rem] shadow-xl flex items-center justify-between group hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300"
            >
              <div className="flex flex-col items-start">
