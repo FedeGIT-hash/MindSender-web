@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import TextType from '../components/TextType';
 import { supabase } from '../lib/supabase';
 import { 
   format, 
@@ -18,7 +17,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Terminal, Activity } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Sparkles, Zap, Brain, Coffee } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import { useTheme } from '../context/ThemeContext';
 
@@ -53,6 +52,19 @@ export default function Dashboard() {
   const [isDev, setIsDev] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Creative Header State
+  const [mantraIndex, setMantraIndex] = useState(0);
+  const mantras = [
+    { text: "Modo Creativo", icon: <Sparkles size={14} className="text-amber-400" /> },
+    { text: "Focus Total", icon: <Zap size={14} className="text-yellow-400" /> },
+    { text: "Flow State", icon: <Brain size={14} className="text-violet-400" /> },
+    { text: "Break Time", icon: <Coffee size={14} className="text-emerald-400" /> },
+  ];
+
+  const cycleMantra = () => {
+    setMantraIndex((prev) => (prev + 1) % mantras.length);
+  };
 
   const modalRef = useRef<HTMLDivElement>(null);
   const settingsModalRef = useRef<HTMLDivElement>(null);
@@ -629,27 +641,23 @@ export default function Dashboard() {
                 )}
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></div>
               </div>
-              <div>
-                <div className="text-[10px] sm:text-base text-gray-400 dark:text-gray-500 font-semibold tracking-wide uppercase leading-none mb-1 flex items-center gap-2">
-                  Bienvenido
-                  {isDev && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-[10px] rounded-full border border-violet-200 dark:border-violet-800 font-bold animate-pulse">
-                      <Terminal size={10} />
-                      Dev
-                    </span>
-                  )}
-                </div>
-                <div className="font-extrabold text-gray-900 dark:text-white text-base sm:text-2xl leading-tight tracking-tight flex items-center gap-2">
-                  <TextType 
-                    text={[userName]} 
-                    typingSpeed={100} 
-                    deletingSpeed={50} 
-                    pauseDuration={5000} 
-                    loop={false}
-                    className="text-gray-900 dark:text-white"
-                    cursorCharacter=""
-                  />
-                  {isDev && <ShieldCheck size={20} className="text-violet-500" />}
+              <div className="flex flex-col justify-center ml-2">
+                <div 
+                  onClick={cycleMantra}
+                  className="cursor-pointer group select-none"
+                >
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1.5 transition-colors group-hover:text-gray-600 dark:group-hover:text-gray-300">
+                    {mantras[mantraIndex].icon}
+                    STATUS
+                    {isDev && (
+                      <span className="ml-1 flex items-center gap-0.5 px-1.5 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-[9px] rounded-full border border-violet-200 dark:border-violet-800 font-bold">
+                        DEV
+                      </span>
+                    )}
+                  </span>
+                  <div className="text-base sm:text-xl font-black text-gray-900 dark:text-white bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 group-hover:from-violet-600 group-hover:to-indigo-600 dark:group-hover:from-violet-400 dark:group-hover:to-indigo-400 transition-all duration-300">
+                    {mantras[mantraIndex].text}
+                  </div>
                 </div>
               </div>
             </div>
