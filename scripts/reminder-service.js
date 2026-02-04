@@ -87,29 +87,62 @@ async function checkReminders() {
     if (!profile || !profile.email) continue;
 
     const mailOptions = {
-      from: `"MindSender" <${process.env.SMTP_USER}>`,
+      from: `"MindSender AI" <${process.env.SMTP_USER}>`,
       to: profile.email,
-      subject: `Recordatorio: ${task.subject} - MindSender`,
+      subject: `⚡ Recordatorio: ${task.subject}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <h2 style="color: #7c3aed;">Hola ${profile.full_name || 'Usuario'}</h2>
-          <p>Tienes una tarea que vence pronto (en 2-3 horas):</p>
-          
-          <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin: 0 0 10px 0; color: #1f2937;">${task.subject}</h3>
-            <p style="margin: 0; color: #4b5563;">${task.description}</p>
-            <p style="margin-top: 10px; font-size: 0.9em; color: #6b7280;">
-              Fecha: ${new Date(task.due_date).toLocaleString()}
-            </p>
-          </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; margin-bottom: 40px;">
+            
+            <!-- Header with Gradient -->
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); padding: 30px 40px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">MindSender</h1>
+              <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 14px;">Tu asistente inteligente</p>
+            </div>
 
-          <p>No olvides marcarla como completada cuando termines.</p>
-          
-          <a href="${process.env.APP_URL || 'http://localhost:5173'}" 
-             style="display: inline-block; background-color: #7c3aed; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-            Ir a MindSender
-          </a>
-        </div>
+            <!-- Content -->
+            <div style="padding: 40px;">
+              <h2 style="color: #1f2937; margin-top: 0; font-size: 20px;">Hola, ${profile.full_name?.split(' ')[0] || 'Viajero'} 👋</h2>
+              <p style="color: #4b5563; line-height: 1.6; font-size: 16px;">
+                Tienes una tarea programada que requiere tu atención pronto. Aquí están los detalles:
+              </p>
+
+              <!-- Task Card -->
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #7c3aed;">
+                <h3 style="margin: 0 0 8px 0; color: #1e293b; font-size: 18px;">${task.subject}</h3>
+                ${task.description ? `<p style="margin: 0 0 16px 0; color: #64748b; font-size: 14px;">${task.description}</p>` : ''}
+                
+                <div style="display: flex; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                  <div style="background-color: #ede9fe; color: #7c3aed; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;">
+                    ⏰ Vence: ${new Date(task.due_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <div style="text-align: center; margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://mind-sender-web.vercel.app'}" 
+                   style="display: inline-block; background-color: #111827; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                  Ver en el Dashboard
+                </a>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0; color: #94a3b8; font-size: 12px;">
+                Enviado automáticamente por <strong>MindSender AI</strong><br>
+                Organiza tu mente, domina tu tiempo.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
       `,
     };
 
