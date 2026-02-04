@@ -54,13 +54,21 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
 
   // Creative Header State
-  const [mantraIndex, setMantraIndex] = useState(0);
+  const [mantraIndex, setMantraIndex] = useState(() => {
+    const saved = localStorage.getItem('mindSender_currentMode');
+    return saved ? parseInt(saved) : 0;
+  });
+
   const mantras = [
     { text: "Modo Creativo", icon: <Sparkles size={14} className="text-amber-400" /> },
     { text: "Focus Total", icon: <Zap size={14} className="text-yellow-400" /> },
     { text: "Flow State", icon: <Brain size={14} className="text-violet-400" /> },
     { text: "Break Time", icon: <Coffee size={14} className="text-emerald-400" /> },
   ];
+
+  useEffect(() => {
+    localStorage.setItem('mindSender_currentMode', mantraIndex.toString());
+  }, [mantraIndex]);
 
   const cycleMantra = () => {
     setMantraIndex((prev) => (prev + 1) % mantras.length);
