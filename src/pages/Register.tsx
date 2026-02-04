@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import gsap from 'gsap';
-import { Mail, Lock, User, Calendar, Activity } from 'lucide-react';
+import { Mail, Lock, User, Calendar, Activity, Eye, EyeOff, Check, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function Register() {
@@ -11,6 +11,8 @@ export default function Register() {
   const decorationRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -18,6 +20,18 @@ export default function Register() {
     sex: 'male',
     age: '',
   });
+
+  useEffect(() => {
+    // Calculate password strength
+    const pass = formData.password;
+    let strength = 0;
+    if (pass.length > 5) strength += 1;
+    if (pass.length > 9) strength += 1;
+    if (/[A-Z]/.test(pass)) strength += 1;
+    if (/[0-9]/.test(pass)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(pass)) strength += 1;
+    setPasswordStrength(Math.min(strength, 4));
+  }, [formData.password]);
 
   useEffect(() => {
     // Animate form entrance
@@ -193,14 +207,42 @@ export default function Register() {
               <div className="relative group">
                 <Lock className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
+              
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-2 space-y-1">
+                  <div className="flex gap-1 h-1">
+                    {[1, 2, 3, 4].map((level) => (
+                      <div 
+                        key={level}
+                        className={`h-full flex-1 rounded-full transition-all duration-300 ${
+                          passwordStrength >= level 
+                            ? passwordStrength <= 2 ? 'bg-red-500' : passwordStrength === 3 ? 'bg-yellow-500' : 'bg-green-500'
+                            : 'bg-gray-200 dark:bg-gray-700'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-right font-medium text-gray-500 dark:text-gray-400">
+                    {passwordStrength <= 2 ? 'Débil' : passwordStrength === 3 ? 'Media' : 'Fuerte'}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4">

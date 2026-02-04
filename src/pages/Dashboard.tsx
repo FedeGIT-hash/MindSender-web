@@ -18,7 +18,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Terminal } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Terminal, Activity } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import { useTheme } from '../context/ThemeContext';
 
@@ -687,17 +687,6 @@ export default function Dashboard() {
                 )}
               </button>
 
-              <button 
-                onClick={() => setIsAIOpen(true)}
-                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
-                title="Sender AI"
-              >
-                <Bot size={20} className="sm:w-6 sm:h-6" />
-                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 flex h-2 w-2 sm:h-3 sm:w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-violet-500"></span>
-                </span>
-              </button>
 
               <button 
                 onClick={openSettings}
@@ -744,49 +733,108 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Daily Summary */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 dashboard-control">
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-gray-700/50 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
-             <div className="flex items-center gap-4">
-                <div className="p-3 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 rounded-2xl">
-                   <Clock size={24} />
+        {/* Bento Grid Dashboard */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 dashboard-control">
+          {/* Welcome Card - Spans 2 cols */}
+          <div className="md:col-span-2 bg-gradient-to-br from-white/90 to-white/50 dark:from-gray-800/90 dark:to-gray-800/50 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-white/60 dark:border-gray-700/60 shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 dark:bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 transition-all duration-700 group-hover:bg-emerald-400/20"></div>
+            <div className="relative z-10 flex flex-col justify-between h-full">
+              <div>
+                <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <Clock size={16} />
+                  {format(new Date(), 'EEEE, d MMMM', { locale: es })}
+                </h3>
+                <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
+                  {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">{userName.split(' ')[0]}</span>.
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 font-medium text-lg max-w-md">
+                  Tienes <span className="text-gray-900 dark:text-white font-bold">{todayTasks.length} tareas</span> pendientes para hoy. ¡A por ellas!
+                </p>
+              </div>
+              <div className="mt-8 flex gap-3">
+                <div className="flex -space-x-3">
+                  {[1,2,3].map(i => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500">
+                      <User size={16} />
+                    </div>
+                  ))}
                 </div>
-                <div>
-                   <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">Momento</h3>
-                   <p className="text-xl font-bold text-gray-900 dark:text-white">{getGreeting()}</p>
+                <div className="flex items-center text-sm font-bold text-gray-500 dark:text-gray-400 px-3 py-2 bg-gray-100 dark:bg-gray-700/50 rounded-full">
+                  <span>Equipo MindSender</span>
                 </div>
-             </div>
-          </div>
-          
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-gray-700/50 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
-             <div className="flex items-center gap-4">
-                <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl">
-                   <CheckCircle2 size={24} />
-                </div>
-                <div>
-                   <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">Para Hoy</h3>
-                   <p className="text-xl font-bold text-gray-900 dark:text-white">
-                      {todayTasks.length === 0 ? '¡Todo al día!' : `${todayTasks.length} Tareas pendientes`}
-                   </p>
-                </div>
-             </div>
+              </div>
+            </div>
           </div>
 
-           <div className="bg-gradient-to-br from-violet-600 to-indigo-700 text-white p-6 rounded-3xl shadow-xl shadow-violet-500/20 relative overflow-hidden group cursor-pointer transform hover:scale-[1.02] transition-transform duration-300" onClick={() => setIsAIOpen(true)}>
-              <div className="absolute -bottom-4 -right-4 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12">
-                 <Bot size={80} />
+          {/* Sender AI Card - Vertical */}
+          <div 
+            onClick={() => setIsAIOpen(true)}
+            className="md:row-span-2 bg-gradient-to-b from-violet-600 to-indigo-700 text-white p-6 sm:p-8 rounded-[2rem] shadow-xl shadow-violet-500/20 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-violet-500/40 hover:-translate-y-1"
+          >
+            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-violet-400/30 rounded-full blur-3xl group-hover:bg-violet-400/50 transition-all duration-500"></div>
+            
+            <div className="relative z-10 flex flex-col h-full justify-between">
+              <div className="flex justify-between items-start">
+                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                  <Bot size={32} className="text-white" />
+                </div>
+                <span className="px-3 py-1 bg-violet-900/50 backdrop-blur-md rounded-full text-xs font-bold border border-white/10 text-violet-200">BETA 1.1</span>
               </div>
-              <div className="relative z-10 flex flex-col h-full justify-between">
-                 <div>
-                    <h3 className="text-xs font-bold text-violet-200 uppercase tracking-wider mb-1">Sender AI</h3>
-                    <p className="text-lg font-bold leading-tight">¿En qué puedo ayudarte hoy?</p>
-                 </div>
-                 <div className="mt-4 flex items-center gap-2 text-xs font-medium text-violet-200 group-hover:text-white transition-colors">
-                    <span>Hablar ahora</span>
-                    <ChevronRight size={14} />
-                 </div>
+              
+              <div className="mt-8">
+                <h3 className="text-2xl font-bold mb-2">Sender AI</h3>
+                <p className="text-violet-100 leading-relaxed mb-6 text-sm opacity-90">
+                  Tu asistente inteligente personal. Organiza, pregunta y optimiza tu tiempo.
+                </p>
+                
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 group-hover:bg-white/20 transition-all">
+                  <div className="flex items-center gap-3 text-sm text-violet-100">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>¿En qué puedo ayudarte?</span>
+                  </div>
+                </div>
               </div>
-           </div>
+            </div>
+          </div>
+
+          {/* Quick Stats / Action */}
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 dark:border-gray-700/50 shadow-xl flex flex-col justify-between group hover:border-emerald-500/30 transition-colors">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl">
+                <Activity size={24} />
+              </div>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-lg">Progreso</span>
+            </div>
+            <div>
+              <div className="flex items-end gap-2 mb-2">
+                <span className="text-4xl font-black text-gray-900 dark:text-white">
+                  {Math.round((tasks.filter(t => t.is_completed).length / (tasks.length || 1)) * 100)}%
+                </span>
+                <span className="text-sm font-bold text-gray-500 mb-1.5">Completado</span>
+              </div>
+              <div className="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${(tasks.filter(t => t.is_completed).length / (tasks.length || 1)) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+          
+           {/* Add Task Quick Button */}
+           <button 
+            onClick={() => onDateClick(new Date())}
+            className="bg-gray-900 dark:bg-emerald-600 text-white p-6 rounded-[2rem] shadow-xl flex items-center justify-between group hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300"
+           >
+             <div className="flex flex-col items-start">
+               <span className="text-lg font-bold">Nueva Tarea</span>
+               <span className="text-sm text-gray-400 dark:text-emerald-200 group-hover:text-emerald-100">Crear recordatorio</span>
+             </div>
+             <div className="p-3 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors group-hover:rotate-90 duration-300">
+               <Plus size={24} />
+             </div>
+           </button>
         </div>
 
         {renderCalendar()}
