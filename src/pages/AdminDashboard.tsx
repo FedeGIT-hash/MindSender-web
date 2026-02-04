@@ -43,6 +43,7 @@ export default function AdminDashboard() {
 
   const fetchAdminStats = async () => {
     try {
+      // Fetch tasks count
       const { count: taskCount } = await supabase
         .from('tasks')
         .select('*', { count: 'exact', head: true });
@@ -52,8 +53,19 @@ export default function AdminDashboard() {
         .select('*', { count: 'exact', head: true })
         .eq('is_completed', true);
 
+      // Fetch users count from profiles if available, otherwise default to 1
+      let userCount = 1;
+      try {
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+        if (count !== null) userCount = count;
+      } catch (e) {
+        console.warn('Profiles table access failed, defaulting to 1 user');
+      }
+
       setStats({
-        totalUsers: 1, 
+        totalUsers: userCount, 
         totalTasks: taskCount || 0,
         completedTasks: completedCount || 0,
         recentLogins: [
@@ -66,6 +78,33 @@ export default function AdminDashboard() {
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
+    }
+  };
+
+  const handleBackup = async () => {
+    try {
+      const { data } = await supabase.from('tasks').select('*');
+      if (!data) return;
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mindsender-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      alert('Backup descargado correctamente.');
+    } catch (e) {
+      alert('Error al generar backup.');
+    }
+  };
+
+  const handleClearCache = () => {
+    if (window.confirm('¿Estás seguro? Esto borrará la sesión local.')) {
+      localStorage.clear();
+      window.location.reload();
     }
   };
 
@@ -233,11 +272,17 @@ export default function AdminDashboard() {
               <h3 className="text-xl font-black mb-4 relative z-10">Consola de Comandos</h3>
               <p className="text-violet-100/80 text-sm mb-6 relative z-10">Ejecuta acciones de mantenimiento directamente en el core del sistema.</p>
               <div className="space-y-3 relative z-10">
-                <button className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                <button 
+                  onClick={handleBackup}
+                  className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                >
                   <Database size={16} />
                   Backup DB
                 </button>
-                <button className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                <button 
+                  onClick={handleClearCache}
+                  className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                >
                   <Activity size={16} />
                   Clear Cache
                 </button>

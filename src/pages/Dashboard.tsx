@@ -459,6 +459,15 @@ export default function Dashboard() {
     }
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Buenos días';
+    if (hour < 18) return 'Buenas tardes';
+    return 'Buenas noches';
+  };
+
+  const todayTasks = tasks.filter(t => isSameDay(new Date(t.due_date), new Date()) && !t.is_completed);
+
   const renderCalendar = () => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
@@ -733,6 +742,51 @@ export default function Dashboard() {
             </div>
             <span className="font-bold text-base sm:text-lg tracking-tight">Nueva Tarea</span>
           </button>
+        </div>
+
+        {/* Daily Summary */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 dashboard-control">
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-gray-700/50 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
+             <div className="flex items-center gap-4">
+                <div className="p-3 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 rounded-2xl">
+                   <Clock size={24} />
+                </div>
+                <div>
+                   <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">Momento</h3>
+                   <p className="text-xl font-bold text-gray-900 dark:text-white">{getGreeting()}</p>
+                </div>
+             </div>
+          </div>
+          
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-gray-700/50 shadow-xl transform hover:scale-[1.02] transition-transform duration-300">
+             <div className="flex items-center gap-4">
+                <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl">
+                   <CheckCircle2 size={24} />
+                </div>
+                <div>
+                   <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">Para Hoy</h3>
+                   <p className="text-xl font-bold text-gray-900 dark:text-white">
+                      {todayTasks.length === 0 ? '¡Todo al día!' : `${todayTasks.length} Tareas pendientes`}
+                   </p>
+                </div>
+             </div>
+          </div>
+
+           <div className="bg-gradient-to-br from-violet-600 to-indigo-700 text-white p-6 rounded-3xl shadow-xl shadow-violet-500/20 relative overflow-hidden group cursor-pointer transform hover:scale-[1.02] transition-transform duration-300" onClick={() => setIsAIOpen(true)}>
+              <div className="absolute -bottom-4 -right-4 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12">
+                 <Bot size={80} />
+              </div>
+              <div className="relative z-10 flex flex-col h-full justify-between">
+                 <div>
+                    <h3 className="text-xs font-bold text-violet-200 uppercase tracking-wider mb-1">Sender AI</h3>
+                    <p className="text-lg font-bold leading-tight">¿En qué puedo ayudarte hoy?</p>
+                 </div>
+                 <div className="mt-4 flex items-center gap-2 text-xs font-medium text-violet-200 group-hover:text-white transition-colors">
+                    <span>Hablar ahora</span>
+                    <ChevronRight size={14} />
+                 </div>
+              </div>
+           </div>
         </div>
 
         {renderCalendar()}
