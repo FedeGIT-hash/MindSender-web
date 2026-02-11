@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { Mail, Lock } from 'lucide-react';
+import RotatingText from '../components/RotatingText';
 import { supabase } from '../lib/supabase';
 
 export default function Login() {
@@ -103,9 +104,20 @@ export default function Login() {
         </svg>
 
         <div className="relative z-10 max-w-lg">
-          <h1 className="decoration-text text-5xl font-bold text-gray-900 dark:text-white mb-2">
-            MindSender
-          </h1>
+          <div className="decoration-text mb-2">
+            <RotatingText 
+              texts={['React', 'Bits', 'Is', 'Cool!']} 
+              mainClassName="px-2 sm:px-2 md:px-3 bg-cyan-300 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg text-5xl font-bold" 
+              staggerFrom={"last"} 
+              initial={{ y: "100%" }} 
+              animate={{ y: 0 }} 
+              exit={{ y: "-120%" }} 
+              staggerDuration={0.025} 
+              splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1" 
+              transition={{ type: "spring", damping: 30, stiffness: 400 }} 
+              rotationInterval={2000} 
+            />
+          </div>
           <p className="decoration-text text-xl text-green-600 dark:text-green-400 font-semibold mb-8">
             Lott
           </p>
