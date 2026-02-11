@@ -108,7 +108,7 @@ export default function Login() {
             <span className="text-5xl font-bold text-gray-900 dark:text-white">MindSender</span>
             <RotatingText 
               texts={['Sender', 'Is', 'Cool!', 'Productivity', 'Automation', 'Creativity']} 
-              mainClassName="px-2 sm:px-2 md:px-3 bg-green-500 text-white overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg text-5xl font-bold" 
+              mainClassName="px-2 sm:px-2 md:px-3 bg-green-500 text-white overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg text-5xl font-bold relative" 
               staggerFrom={"last"} 
               initial={{ y: "100%", opacity: 0, filter: "blur(10px)" }} 
               animate={{ y: 0, opacity: 1, filter: "blur(0px)" }} 
@@ -117,6 +117,7 @@ export default function Login() {
               splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1" 
               transition={{ type: "spring", damping: 20, stiffness: 200 }} 
               rotationInterval={2000} 
+              animatePresenceMode="popLayout"
             />
           </div>
           <p className="decoration-text text-xl text-green-600 dark:text-green-400 font-semibold mb-8">
