@@ -107,15 +107,15 @@ export default function Login() {
           <div className="decoration-text mb-2 flex items-center gap-3">
             <span className="text-5xl font-bold text-gray-900 dark:text-white">MindSender</span>
             <RotatingText 
-              texts={['Sender', 'Is', 'Cool!']} 
+              texts={['Sender', 'Is', 'Cool!', 'Productivity', 'Automation', 'Creativity']} 
               mainClassName="px-2 sm:px-2 md:px-3 bg-green-500 text-white overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg text-5xl font-bold" 
               staggerFrom={"last"} 
-              initial={{ y: "100%" }} 
-              animate={{ y: 0 }} 
-              exit={{ y: "-120%" }} 
+              initial={{ y: "100%", opacity: 0, filter: "blur(10px)" }} 
+              animate={{ y: 0, opacity: 1, filter: "blur(0px)" }} 
+              exit={{ y: "-120%", opacity: 0, filter: "blur(10px)" }} 
               staggerDuration={0.025} 
               splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1" 
-              transition={{ type: "spring", damping: 30, stiffness: 400 }} 
+              transition={{ type: "spring", damping: 20, stiffness: 200 }} 
               rotationInterval={2000} 
             />
           </div>
