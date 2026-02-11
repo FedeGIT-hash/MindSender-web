@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { motion, AnimatePresence, Transition } from 'framer-motion'
 
 export interface RotatingTextProps {
@@ -76,7 +76,6 @@ const RotatingText = forwardRef<any, RotatingTextProps>((props, ref) => {
   }, [texts, currentTextIndex, splitBy])
 
   const getStaggerDelay = (index: number, total: number) => {
-    const totalDelay = total * staggerDuration
     if (staggerFrom === 'first') return index * staggerDuration
     if (staggerFrom === 'last') return (total - 1 - index) * staggerDuration
     if (staggerFrom === 'center') {
