@@ -109,50 +109,56 @@ export default function Dashboard() {
       fetchTasks();
     }
 
-    // Header animation with improved staggering
+    // Header animation with improved staggering and physics-like feel
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
     
     tl.fromTo(headerRef.current, 
-      { y: -30, opacity: 0, filter: 'blur(10px)' }, 
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.2 }
+      { y: -50, opacity: 0, filter: 'blur(10px)' }, 
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.2, ease: 'elastic.out(1, 0.75)' }
     )
     .fromTo('.dashboard-control',
-      { y: 30, opacity: 0, filter: 'blur(5px)' },
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.15 },
+      { y: 50, opacity: 0, filter: 'blur(10px)', scale: 0.95 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1, stagger: 0.1, ease: 'power3.out' },
       '-=0.8'
     )
     .fromTo('.calendar-card', 
-      { scale: 0.9, opacity: 0, y: 40, filter: 'blur(10px)' }, 
-      { scale: 1, opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'expo.out' },
-      '-=1'
+      { scale: 0.9, opacity: 0, y: 60, filter: 'blur(20px)' }, 
+      { scale: 1, opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'expo.out' },
+      '-=0.8'
     )
     .fromTo('.bg-blob',
       { scale: 0, opacity: 0 },
-      { scale: 1, opacity: 0.6, duration: 2, stagger: 0.3, ease: 'elastic.out(1, 0.75)' },
+      { scale: 1, opacity: 0.8, duration: 2.5, stagger: 0.2, ease: 'elastic.out(1, 0.5)' },
       '-=1.5'
     );
 
     // Continuous floating animation for blobs with smoother motion
     gsap.to('.bg-blob-1', {
-      x: 'random(-80, 80)',
-      y: 'random(-80, 80)',
-      duration: 'random(15, 25)',
+      x: 'random(-100, 100)',
+      y: 'random(-100, 100)',
+      rotation: 'random(-180, 180)',
+      scale: 'random(0.8, 1.2)',
+      duration: 'random(25, 35)', // Slower
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut'
     });
     gsap.to('.bg-blob-2', {
-      x: 'random(-60, 60)',
-      y: 'random(-60, 60)',
-      duration: 'random(20, 30)',
+      x: 'random(-80, 80)',
+      y: 'random(-80, 80)',
+      rotation: 'random(-180, 180)',
+      scale: 'random(0.9, 1.1)',
+      duration: 'random(30, 40)', // Slower
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut'
     });
     gsap.to('.bg-blob-3', {
-      x: 'random(-70, 70)',
-      y: 'random(-70, 70)',
-      duration: 'random(18, 22)',
+      x: 'random(-90, 90)',
+      y: 'random(-90, 90)',
+      rotation: 'random(-180, 180)',
+      scale: 'random(0.8, 1.2)',
+      duration: 'random(28, 38)', // Slower
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut'
@@ -567,36 +573,38 @@ export default function Dashboard() {
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
     return (
-      <div className="calendar-card bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+      <div className="calendar-card bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-[2.5rem] shadow-xl border border-white/60 dark:border-gray-700/60 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] dark:hover:shadow-[0_20px_60px_rgba(16,185,129,0.2)] group">
         {/* Calendar Header */}
-        <div className="flex justify-between items-center p-5 sm:p-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500 dark:from-emerald-900 dark:via-emerald-800 dark:to-green-900 text-white relative overflow-hidden">
+        <div className="flex justify-between items-center p-6 sm:p-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500 dark:from-emerald-900 dark:via-emerald-800 dark:to-green-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/20 rounded-full blur-3xl"></div>
+          
           <div className="flex items-center gap-4 sm:gap-6 relative z-10">
-            <div className="p-2 sm:p-3 bg-white/20 rounded-2xl sm:rounded-[1.5rem] backdrop-blur-md border border-white/30 shadow-inner">
-              <h2 className="text-xl sm:text-3xl font-extrabold capitalize tracking-tight leading-none mb-1">
+            <div className="p-3 sm:p-4 bg-white/20 rounded-2xl sm:rounded-[1.5rem] backdrop-blur-xl border border-white/30 shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <h2 className="text-2xl sm:text-4xl font-black capitalize tracking-tight leading-none mb-1 drop-shadow-sm">
                 {format(currentDate, 'MMMM', { locale: es })}
               </h2>
-              <span className="text-emerald-100/80 text-[10px] sm:text-sm font-bold tracking-[0.1em] sm:tracking-[0.2em] uppercase">
+              <span className="text-emerald-50 text-[10px] sm:text-sm font-bold tracking-[0.2em] uppercase opacity-90">
                 {format(currentDate, 'yyyy', { locale: es })}
               </span>
             </div>
           </div>
           <div className="flex gap-2 sm:gap-3 relative z-10">
-            <button onClick={handlePrevMonth} className="p-2 sm:p-3 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
-              <ChevronLeft size={20} className="sm:w-7 sm:h-7 group-hover:-translate-x-0.5 transition-transform" />
+            <button onClick={handlePrevMonth} className="p-3 sm:p-4 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group/btn shadow-lg hover:shadow-xl">
+              <ChevronLeft size={20} className="sm:w-6 sm:h-6 group-hover/btn:-translate-x-1 transition-transform" />
             </button>
-            <button onClick={handleNextMonth} className="p-2 sm:p-3 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group">
-              <ChevronRight size={20} className="sm:w-7 sm:h-7 group-hover:translate-x-0.5 transition-transform" />
+            <button onClick={handleNextMonth} className="p-3 sm:p-4 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group/btn shadow-lg hover:shadow-xl">
+              <ChevronRight size={20} className="sm:w-6 sm:h-6 group-hover/btn:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
 
-        <div className="p-4 sm:p-8 bg-white/50 dark:bg-gray-800/50">
+        <div className="p-4 sm:p-8 bg-gradient-to-b from-white/50 to-white/20 dark:from-gray-800/50 dark:to-gray-900/50">
           <div className="calendar-grid-content">
             {/* Weekdays */}
             <div className="grid grid-cols-7 gap-1 sm:gap-4 mb-4 sm:mb-6">
               {weekDays.map((day) => (
-                <div key={day} className="text-center text-[10px] sm:text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.1em] sm:tracking-[0.2em]">
+                <div key={day} className="text-center text-[10px] sm:text-xs font-black text-emerald-600/60 dark:text-emerald-400/60 uppercase tracking-[0.1em] sm:tracking-[0.2em]">
                   {day}
                 </div>
               ))}
@@ -613,64 +621,64 @@ export default function Dashboard() {
                   <div 
                     key={idx}
                     onClick={() => onDateClick(day)}
-                    className={`group relative min-h-[100px] sm:min-h-[140px] p-2 sm:p-4 rounded-xl sm:rounded-3xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
+                    className={`group relative min-h-[100px] sm:min-h-[140px] p-2 sm:p-4 rounded-xl sm:rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden ${
                       !isCurrentMonth 
-                        ? 'bg-gray-50/30 dark:bg-gray-900/10 border-transparent opacity-40' 
+                        ? 'bg-gray-50/30 dark:bg-gray-900/10 border-transparent opacity-30 blur-[0.5px]' 
                         : isToday
-                          ? 'bg-emerald-50/50 dark:bg-emerald-900/20 border-emerald-500/50 dark:border-emerald-500/50 shadow-lg shadow-emerald-500/10'
-                          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-xl hover:-translate-y-1'
+                          ? 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/40 dark:to-gray-800 border-emerald-500 shadow-lg shadow-emerald-500/20 scale-[1.02] z-10'
+                          : 'bg-white/60 dark:bg-gray-800/40 border-white/40 dark:border-gray-700/40 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-xl hover:-translate-y-1 hover:bg-white dark:hover:bg-gray-800 backdrop-blur-sm'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2 sm:mb-3 relative z-10">
-                      <span className={`text-base sm:text-xl font-bold transition-colors ${
+                      <span className={`text-base sm:text-2xl font-black transition-colors ${
                         isToday 
                           ? 'text-emerald-600 dark:text-emerald-400' 
                           : isCurrentMonth 
-                            ? 'text-gray-900 dark:text-white' 
+                            ? 'text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400' 
                             : 'text-gray-400 dark:text-gray-600'
                       }`}>
                         {format(day, 'd')}
                       </span>
                       {dayTasks.length > 0 && (
-                        <span className="flex h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                        <span className="flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse"></span>
                       )}
                     </div>
                     
-                    <div className="space-y-1 sm:space-y-1.5 relative z-10">
+                    <div className="space-y-1 sm:space-y-2 relative z-10">
                       {dayTasks.slice(0, 2).map((task) => (
                         <div 
                           key={task.id}
                           onClick={(e) => handleEditTask(task, e)}
-                          className={`text-[8px] sm:text-[10px] p-1 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-200 flex flex-col gap-0.5 group/task ${
+                          className={`text-[9px] sm:text-[11px] p-1.5 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-200 flex flex-col gap-0.5 group/task ${
                             task.is_completed 
                               ? 'bg-gray-100/50 dark:bg-gray-700/30 border-transparent text-gray-400 line-through' 
-                              : 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-[1.02] shadow-sm'
+                              : 'bg-emerald-50/80 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-105 hover:shadow-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
                           }`}
                         >
-                          <div className="flex items-center gap-1 sm:gap-2">
-                            {task.is_completed ? <CheckCircle2 size={10} className="sm:w-3 sm:h-3" /> : <Circle size={10} className="sm:w-3 sm:h-3 group-hover/task:scale-110 transition-transform" />}
+                          <div className="flex items-center gap-1.5">
+                            {task.is_completed ? <CheckCircle2 size={12} className="text-gray-400" /> : <Circle size={12} className="text-emerald-500 group-hover/task:fill-emerald-500 transition-colors" />}
                             <span className="truncate">{task.subject}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-[7px] sm:text-[8px] opacity-70">
-                            <Clock size={8} className="sm:w-2.5 sm:h-2.5" />
+                          <div className="flex items-center gap-1 text-[8px] sm:text-[9px] opacity-70 pl-0.5">
+                            <Clock size={8} className="sm:w-3 sm:h-3" />
                             <span>{format(new Date(task.due_date), 'HH:mm')}</span>
                           </div>
                         </div>
                       ))}
                       {dayTasks.length > 2 && (
-                        <div className="text-[8px] sm:text-[9px] text-gray-400 dark:text-gray-500 font-bold pl-1 sm:pl-2">
-                          + {dayTasks.length - 2}
+                        <div className="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 font-bold pl-1 sm:pl-2 group-hover:text-emerald-500 transition-colors">
+                          + {dayTasks.length - 2} más
                         </div>
                       )}
                     </div>
 
                     {/* Hover indicator gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     
                     {/* Add indicator on hover - hidden on small screens */}
                     {isCurrentMonth && (
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-2 group-hover:translate-x-0 hidden sm:block">
-                        <Plus size={18} />
+                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-4 group-hover:translate-x-0 hidden sm:block p-1 bg-emerald-50 dark:bg-emerald-900/50 rounded-full">
+                        <Plus size={16} strokeWidth={3} />
                       </div>
                     )}
                   </div>
@@ -688,11 +696,11 @@ export default function Dashboard() {
       {/* Background Decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="bg-blob bg-blob-1 absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-emerald-200/30 dark:bg-emerald-900/20 rounded-full blur-[100px]" />
-        <div className="bg-blob bg-blob-2 absolute top-[20%] -right-[5%] w-[35%] h-[35%] bg-violet-200/30 dark:bg-violet-900/20 rounded-full blur-[100px]" />
-        <div className="bg-blob bg-blob-3 absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] bg-blue-200/30 dark:bg-blue-900/20 rounded-full blur-[100px]" />
+        <div className="bg-blob bg-blob-2 absolute top-[20%] -right-[5%] w-[35%] h-[35%] bg-teal-200/30 dark:bg-teal-900/20 rounded-full blur-[100px]" />
+        <div className="bg-blob bg-blob-3 absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] bg-lime-200/30 dark:bg-lime-900/20 rounded-full blur-[100px]" />
         
         {/* Extra decorative blobs */}
-        <div className="bg-blob absolute top-[40%] left-[40%] w-[15%] h-[15%] bg-amber-100/20 dark:bg-amber-900/10 rounded-full blur-[60px]" />
+        <div className="bg-blob absolute top-[40%] left-[40%] w-[15%] h-[15%] bg-emerald-100/20 dark:bg-emerald-800/10 rounded-full blur-[60px]" />
         
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.05] pointer-events-none" />
         <div className="absolute inset-0 bg-noise opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
@@ -809,33 +817,37 @@ export default function Dashboard() {
         </div>
 
         {/* Bento Grid Dashboard */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 dashboard-control">
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 dashboard-control perspective-1000">
           {/* Welcome Card - Spans 2 cols */}
-          <div className="md:col-span-2 bg-gradient-to-br from-white/90 to-white/50 dark:from-gray-800/90 dark:to-gray-800/50 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-white/60 dark:border-gray-700/60 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 dark:bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 transition-all duration-700 group-hover:bg-emerald-400/20"></div>
+          <div className="md:col-span-2 bg-gradient-to-br from-emerald-50/80 via-white/50 to-emerald-100/50 dark:from-gray-800/90 dark:via-gray-800/50 dark:to-emerald-900/20 backdrop-blur-2xl p-6 sm:p-8 rounded-[2.5rem] border border-white/60 dark:border-gray-700/60 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 relative overflow-hidden group hover:scale-[1.01]">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-[80px] -mr-32 -mt-32 transition-all duration-700 group-hover:bg-emerald-400/30 group-hover:scale-110"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-[60px] -ml-20 -mb-20 transition-all duration-700 group-hover:bg-teal-400/20"></div>
+            
             <div className="relative z-10 flex flex-col justify-between h-full">
               <div>
-                <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <Clock size={16} />
+                <h3 className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <span className="p-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg"><Clock size={14} /></span>
                   {format(new Date(), 'EEEE, d MMMM', { locale: es })}
                 </h3>
-                <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
-                  {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">{userName.split(' ')[0]}</span>.
+                <h2 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight leading-tight">
+                  {getGreeting()}, <br className="hidden sm:block"/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 animate-gradient-x">{userName.split(' ')[0]}</span>.
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 font-medium text-lg max-w-md">
-                  Tienes <span className="text-gray-900 dark:text-white font-bold">{todayTasks.length} tareas</span> pendientes para hoy. ¡A por ellas!
+                <p className="text-gray-500 dark:text-gray-400 font-medium text-lg sm:text-xl max-w-md leading-relaxed">
+                  Tienes <span className="text-gray-900 dark:text-white font-bold decoration-emerald-400 underline decoration-2 underline-offset-2">{todayTasks.length} tareas</span> pendientes para hoy.
                 </p>
               </div>
-              <div className="mt-8 flex gap-3">
-                <div className="flex -space-x-3">
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <div className="flex -space-x-4 hover:space-x-1 transition-all duration-300">
                   {[1,2,3].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500">
-                      <User size={16} />
+                    <div key={i} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-white dark:border-gray-800 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs font-bold text-gray-500 shadow-lg transform hover:-translate-y-1 transition-transform">
+                      <User size={18} />
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center text-sm font-bold text-gray-500 dark:text-gray-400 px-3 py-2 bg-gray-100 dark:bg-gray-700/50 rounded-full">
-                  <span>Equipo MindSender</span>
+                <div className="flex items-center text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 px-4 py-2 bg-white/50 dark:bg-gray-700/50 rounded-full border border-white/20 backdrop-blur-md shadow-sm">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
+                  Equipo MindSender
                 </div>
               </div>
             </div>
@@ -844,29 +856,33 @@ export default function Dashboard() {
           {/* Sender AI Card - Vertical */}
           <div 
             onClick={() => setIsAIOpen(true)}
-            className="md:row-span-2 bg-gradient-to-b from-violet-600 to-indigo-700 text-white p-6 sm:p-8 rounded-[2rem] shadow-xl shadow-violet-500/20 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-violet-500/40 hover:-translate-y-1"
+            className="md:row-span-2 bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-xl shadow-teal-500/20 relative overflow-hidden group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:shadow-teal-500/40 hover:-translate-y-2 hover:scale-[1.02]"
           >
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-violet-400/30 rounded-full blur-3xl group-hover:bg-violet-400/50 transition-all duration-500"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay"></div>
+            <div className="absolute -bottom-12 -right-12 w-56 h-56 bg-teal-400/30 rounded-full blur-3xl group-hover:bg-teal-400/50 transition-all duration-500 animate-pulse-slow"></div>
+            <div className="absolute top-1/2 left-1/2 w-full h-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
             
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div className="flex justify-between items-start">
-                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                  <Bot size={32} className="text-white" />
+                <div className="p-3.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-inner group-hover:rotate-12 transition-transform duration-300">
+                  <Bot size={32} className="text-white drop-shadow-lg" />
                 </div>
-                <span className="px-3 py-1 bg-violet-900/50 backdrop-blur-md rounded-full text-xs font-bold border border-white/10 text-violet-200">BETA 1.1</span>
+                <span className="px-3 py-1 bg-black/20 backdrop-blur-md rounded-full text-[10px] font-bold border border-white/10 text-teal-100 uppercase tracking-wider">Beta 1.1</span>
               </div>
               
-              <div className="mt-8">
-                <h3 className="text-2xl font-bold mb-2">Sender AI</h3>
-                <p className="text-violet-100 leading-relaxed mb-6 text-sm opacity-90">
-                  Tu asistente inteligente personal. Organiza, pregunta y optimiza tu tiempo.
+              <div className="mt-8 transform transition-all duration-300 group-hover:translate-x-1">
+                <h3 className="text-3xl font-black mb-2 tracking-tight">Sender AI</h3>
+                <p className="text-teal-100 leading-relaxed mb-6 text-sm opacity-90 font-medium">
+                  Tu asistente inteligente personal. Organiza, pregunta y optimiza tu tiempo con IA.
                 </p>
                 
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 group-hover:bg-white/20 transition-all">
-                  <div className="flex items-center gap-3 text-sm text-violet-100">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>¿En qué puedo ayudarte?</span>
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/10 group-hover:bg-white/20 transition-all shadow-lg">
+                  <div className="flex items-center gap-3 text-sm text-teal-50 font-medium">
+                    <div className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </div>
+                    <span>¿En qué puedo ayudarte hoy?</span>
                   </div>
                 </div>
               </div>
@@ -874,25 +890,27 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats / Action */}
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 dark:border-gray-700/50 shadow-xl flex flex-col justify-between group hover:border-emerald-500/30 transition-colors">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/50 dark:border-gray-700/50 shadow-xl flex flex-col justify-between group hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:scale-[1.02]">
             <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl">
+              <div className="p-3 bg-lime-100 dark:bg-lime-900/30 text-lime-600 dark:text-lime-400 rounded-2xl group-hover:scale-110 transition-transform">
                 <Activity size={24} />
               </div>
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-lg">Progreso</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-lg">Diario</span>
             </div>
             <div>
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-4xl font-black text-gray-900 dark:text-white">
+                <span className="text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
                   {Math.round((tasks.filter(t => t.is_completed).length / (tasks.length || 1)) * 100)}%
                 </span>
-                <span className="text-sm font-bold text-gray-500 mb-1.5">Completado</span>
+                <span className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Completado</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-gray-100 dark:bg-gray-700 h-3 rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className="h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out"
+                  className="h-full bg-gradient-to-r from-lime-500 to-emerald-500 rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
                   style={{ width: `${(tasks.filter(t => t.is_completed).length / (tasks.length || 1)) * 100}%` }}
-                ></div>
+                >
+                    <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -904,13 +922,14 @@ export default function Dashboard() {
               setAnimatingFromButton(true);
               onDateClick(new Date());
             }}
-            className="bg-gray-900 dark:bg-emerald-600 text-white p-6 rounded-[2rem] shadow-xl flex items-center justify-between group hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300"
+            className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-emerald-600 dark:to-teal-600 text-white p-6 rounded-[2.5rem] shadow-xl flex items-center justify-between group hover:bg-black dark:hover:bg-emerald-500 transition-all duration-300 relative overflow-hidden hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/20"
            >
-             <div className="flex flex-col items-start">
-               <span className="text-lg font-bold">Nueva Tarea</span>
-               <span className="text-sm text-gray-400 dark:text-emerald-200 group-hover:text-emerald-100">Crear recordatorio</span>
+             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+             <div className="flex flex-col items-start relative z-10">
+               <span className="text-xl font-bold tracking-tight">Nueva Tarea</span>
+               <span className="text-sm text-gray-400 dark:text-emerald-100 group-hover:text-white transition-colors">Crear recordatorio</span>
              </div>
-             <div className="p-3 bg-white/10 rounded-full group-hover:bg-white/20 transition-colors group-hover:rotate-90 duration-300">
+             <div className="p-4 bg-white/10 rounded-full group-hover:bg-white/20 transition-all group-hover:rotate-90 duration-500 shadow-lg backdrop-blur-sm border border-white/10">
                <Plus size={24} />
              </div>
            </button>

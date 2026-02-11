@@ -24,9 +24,9 @@ const GeminiLogo = ({ className }: { className?: string }) => (
     />
     <defs>
       <linearGradient id="gemini-gradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#3B82F6" />
-        <stop offset="50%" stopColor="#8B5CF6" />
-        <stop offset="100%" stopColor="#EC4899" />
+        <stop offset="0%" stopColor="#10B981" />
+        <stop offset="50%" stopColor="#14B8A6" />
+        <stop offset="100%" stopColor="#6366F1" />
       </linearGradient>
     </defs>
   </svg>
@@ -304,10 +304,10 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[90%] sm:max-w-[85%] rounded-2xl p-3 sm:p-4 shadow-sm ${
-              msg.role === 'user' ? 'bg-violet-600 text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 rounded-tl-none'
+              msg.role === 'user' ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 rounded-tl-none'
             }`}>
               <p className="text-xs sm:text-sm leading-relaxed">{msg.content}</p>
-              <span className={`text-[9px] sm:text-[10px] mt-1 block ${msg.role === 'user' ? 'text-violet-200' : 'text-gray-400 dark:text-gray-500'}`}>
+              <span className={`text-[9px] sm:text-[10px] mt-1 block ${msg.role === 'user' ? 'text-teal-100' : 'text-gray-400 dark:text-gray-500'}`}>
                 {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
@@ -316,7 +316,7 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
         {isTyping && (
           <div className="flex justify-start">
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-3 sm:p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1 animate-pulse">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400" />
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-teal-400" />
               <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">Escribiendo...</span>
             </div>
           </div>
@@ -331,13 +331,13 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Pregúntale algo..."
-            className="w-full pl-4 pr-4 py-2 sm:py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none text-xs sm:text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            className="w-full pl-4 pr-4 py-2 sm:py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 resize-none text-xs sm:text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             rows={1}
           />
           <button 
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="p-2 sm:p-3 bg-violet-600 text-white rounded-lg sm:rounded-xl hover:bg-violet-700 disabled:opacity-50 shadow-lg shadow-violet-200 dark:shadow-none transition-all active:scale-95"
+            className="p-2 sm:p-3 bg-teal-600 text-white rounded-lg sm:rounded-xl hover:bg-teal-700 disabled:opacity-50 shadow-lg shadow-teal-200 dark:shadow-none transition-all active:scale-95"
           >
             <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
