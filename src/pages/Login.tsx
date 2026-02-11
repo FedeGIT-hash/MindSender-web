@@ -104,7 +104,8 @@ export default function Login() {
         </svg>
 
         <div className="relative z-10 max-w-lg">
-          <div className="decoration-text mb-2">
+          <div className="decoration-text mb-2 flex items-center gap-3">
+            <span className="text-5xl font-bold text-gray-900 dark:text-white">MindSender</span>
             <RotatingText 
               texts={['React', 'Bits', 'Is', 'Cool!']} 
               mainClassName="px-2 sm:px-2 md:px-3 bg-cyan-300 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg text-5xl font-bold" 
