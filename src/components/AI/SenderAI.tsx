@@ -193,6 +193,7 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
           tool_choice: "auto"
         });
 
+        
         const responseMessage = response.choices[0].message;
 
         if (responseMessage.tool_calls) {
