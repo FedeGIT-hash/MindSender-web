@@ -53,6 +53,8 @@ export default function Dashboard() {
   const [plan, setPlan] = useState<'free' | 'pro' | 'elite'>('free');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentPlan, setPaymentPlan] = useState<'pro' | 'elite' | null>(null);
   const [activeTab, setActiveTab] = useState<'agenda' | 'memberships'>('agenda');
   const isAgendaTab = activeTab === 'agenda';
   const isMembershipsTab = activeTab === 'memberships';
@@ -977,7 +979,8 @@ export default function Dashboard() {
               <button
                 className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors"
                 onClick={() => {
-                  window.open(proCheckoutUrl, '_blank');
+                  setPaymentPlan('pro');
+                  setIsPaymentModalOpen(true);
                 }}
               >
                 Me interesa el Plan Pro
@@ -997,7 +1000,8 @@ export default function Dashboard() {
                 <button
                   className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
                   onClick={() => {
-                    window.open(eliteCheckoutUrl, '_blank');
+                    setPaymentPlan('elite');
+                    setIsPaymentModalOpen(true);
                   }}
                 >
                   Me interesa el Plan Elite
@@ -1009,6 +1013,70 @@ export default function Dashboard() {
 
         <div ref={calendarRef}>{renderCalendar()}</div>
       </main>
+
+      {isPaymentModalOpen && paymentPlan && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
+            onClick={() => setIsPaymentModalOpen(false)}
+          ></div>
+          <div className="relative z-10 w-full max-w-md mx-4 bg-white/95 dark:bg-gray-900/95 rounded-3xl border border-white/20 dark:border-gray-800 shadow-2xl p-6 sm:p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                Confirmar pago
+              </h3>
+              <button
+                onClick={() => setIsPaymentModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="mb-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 p-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-widest font-bold text-emerald-500">
+                  Plan seleccionado
+                </p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  {paymentPlan === 'pro' ? 'Plan Pro' : 'Plan Elite'}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {paymentPlan === 'pro' ? '$4 USD / mes' : '$10 USD / mes'}
+                </p>
+              </div>
+              <div className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+                Pago con Stripe
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
+              Serás redirigido a una pasarela segura de Stripe para completar tu pago.
+              Tu información de tarjeta no se guarda en MindSender.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setIsPaymentModalOpen(false)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  const url = paymentPlan === 'pro' ? proCheckoutUrl : eliteCheckoutUrl;
+                  setIsPaymentModalOpen(false);
+                  window.open(url, '_blank');
+                }}
+                className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2"
+              >
+                <ShieldCheck size={16} />
+                Pagar con Stripe
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Settings Panel - Side Drawer */}
       {isSettingsOpen && (
