@@ -83,8 +83,6 @@ export default function Dashboard() {
   const headerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addTaskBtnRef = useRef<HTMLButtonElement>(null);
-  const [animatingFromButton, setAnimatingFromButton] = useState(false);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -98,7 +96,6 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    // Get user name and avatar from metadata
     if (user?.user_metadata) {
       setUserName(user.user_metadata.full_name || user.email?.split('@')[0] || 'Usuario');
       setAvatarUrl(user.user_metadata.avatar_url || null);
@@ -109,61 +106,29 @@ export default function Dashboard() {
       fetchTasks();
     }
 
-    // Header animation with improved staggering and physics-like feel
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
     
-    tl.fromTo(headerRef.current, 
-      { y: -50, opacity: 0, filter: 'blur(10px)' }, 
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.2, ease: 'elastic.out(1, 0.75)' }
+    tl.fromTo(
+      headerRef.current,
+      { y: -24, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5 }
     )
-    .fromTo('.dashboard-control',
-      { y: 50, opacity: 0, filter: 'blur(10px)', scale: 0.95 },
-      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1, stagger: 0.1, ease: 'power3.out' },
-      '-=0.8'
-    )
-    .fromTo('.calendar-card', 
-      { scale: 0.9, opacity: 0, y: 60, filter: 'blur(20px)' }, 
-      { scale: 1, opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'expo.out' },
-      '-=0.8'
-    )
-    .fromTo('.bg-blob',
-      { scale: 0, opacity: 0 },
-      { scale: 1, opacity: 0.8, duration: 2.5, stagger: 0.2, ease: 'elastic.out(1, 0.5)' },
-      '-=1.5'
-    );
+      .fromTo(
+        '.dashboard-control',
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.08 },
+        '-=0.2'
+      )
+      .fromTo(
+        '.calendar-card',
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4 },
+        '-=0.2'
+      );
 
-    // Continuous floating animation for blobs with smoother motion
-    gsap.to('.bg-blob-1', {
-      x: 'random(-100, 100)',
-      y: 'random(-100, 100)',
-      rotation: 'random(-180, 180)',
-      scale: 'random(0.8, 1.2)',
-      duration: 'random(25, 35)', // Slower
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    });
-    gsap.to('.bg-blob-2', {
-      x: 'random(-80, 80)',
-      y: 'random(-80, 80)',
-      rotation: 'random(-180, 180)',
-      scale: 'random(0.9, 1.1)',
-      duration: 'random(30, 40)', // Slower
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    });
-    gsap.to('.bg-blob-3', {
-      x: 'random(-90, 90)',
-      y: 'random(-90, 90)',
-      rotation: 'random(-180, 180)',
-      scale: 'random(0.8, 1.2)',
-      duration: 'random(28, 38)', // Slower
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    });
-    
+    return () => {
+      tl.kill();
+    };
   }, [user]);
 
   const openNotifications = () => {
@@ -255,106 +220,38 @@ export default function Dashboard() {
 
   const openModal = () => {
     setIsModalOpen(true);
-    // Refined animation for modal
     setTimeout(() => {
       if (modalRef.current && overlayRef.current) {
-        if (animatingFromButton && addTaskBtnRef.current) {
-          const btnRect = addTaskBtnRef.current.getBoundingClientRect();
-          
-          // Initial state: match button
-          gsap.set(modalRef.current, {
-            position: 'fixed',
-            left: btnRect.left,
-            top: btnRect.top,
-            width: btnRect.width,
-            height: btnRect.height,
-            borderRadius: '2rem',
-            opacity: 1,
-            scale: 1,
-            x: 0,
-            y: 0,
-            margin: 0,
-            transformOrigin: 'center center'
-          });
-          
-          gsap.set(overlayRef.current, { opacity: 0 });
-          
-          const tl = gsap.timeline({ defaults: { ease: 'power4.inOut' } });
-          
-          tl.to(overlayRef.current, { opacity: 1, duration: 0.4 })
-            .to(modalRef.current, {
-              left: '50%',
-              top: '50%',
-              xPercent: -50,
-              yPercent: -50,
-              width: '100%',
-              maxWidth: '28rem', // max-w-md
-              height: 'auto',
-              borderRadius: '2.5rem',
-              duration: 0.5
-            }, '<');
-            
-        } else {
-          gsap.set(modalRef.current, { scale: 0.9, opacity: 0, y: 20 });
-          gsap.set(overlayRef.current, { opacity: 0 });
-          
-          gsap.to(overlayRef.current, { opacity: 1, duration: 0.3, ease: 'power2.out' });
-          gsap.to(modalRef.current, { 
-            scale: 1, 
-            opacity: 1, 
-            y: 0, 
-            duration: 0.4, 
-            ease: 'back.out(1.2)' 
-          });
-        }
+        gsap.set(modalRef.current, { scale: 0.96, opacity: 0, y: 12 });
+        gsap.set(overlayRef.current, { opacity: 0 });
+        
+        gsap.to(overlayRef.current, { opacity: 1, duration: 0.2, ease: 'power2.out' });
+        gsap.to(modalRef.current, { 
+          scale: 1, 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.25, 
+          ease: 'power2.out' 
+        });
       }
     }, 10);
   };
 
   const closeModal = () => {
     if (modalRef.current && overlayRef.current) {
-      if (animatingFromButton && addTaskBtnRef.current) {
-        const btnRect = addTaskBtnRef.current.getBoundingClientRect();
-        
-        const tl = gsap.timeline({ 
-          onComplete: () => {
-            setIsModalOpen(false);
-            setEditingTask(null);
-            setNewTask({ subject: '', description: '', due_time: '12:00' });
-            setAnimatingFromButton(false);
-          }
-        });
-
-        tl.to(modalRef.current, {
-          left: btnRect.left,
-          top: btnRect.top,
-          xPercent: 0,
-          yPercent: 0,
-          width: btnRect.width,
-          height: btnRect.height,
-          borderRadius: '2rem',
-          overflow: 'hidden', // Prevent content from spilling
-          opacity: 0, // Fade out slightly at end to smooth transition back to button
-          duration: 0.4,
-          ease: 'power4.inOut'
-        })
-        .to(overlayRef.current, { opacity: 0, duration: 0.3 }, '<0.1');
-        
-      } else {
-        gsap.to(modalRef.current, { 
-          scale: 0.95, 
-          opacity: 0, 
-          y: 10,
-          duration: 0.2, 
-          ease: 'power2.in',
-          onComplete: () => {
-            setIsModalOpen(false);
-            setEditingTask(null);
-            setNewTask({ subject: '', description: '', due_time: '12:00' });
-          }
-        });
-        gsap.to(overlayRef.current, { opacity: 0, duration: 0.2, delay: 0.1 });
-      }
+      gsap.to(modalRef.current, { 
+        scale: 0.98, 
+        opacity: 0, 
+        y: 8,
+        duration: 0.18, 
+        ease: 'power2.in',
+        onComplete: () => {
+          setIsModalOpen(false);
+          setEditingTask(null);
+          setNewTask({ subject: '', description: '', due_time: '12:00' });
+        }
+      });
+      gsap.to(overlayRef.current, { opacity: 0, duration: 0.18, delay: 0.05 });
     }
   };
 
@@ -621,12 +518,12 @@ export default function Dashboard() {
                   <div 
                     key={idx}
                     onClick={() => onDateClick(day)}
-                    className={`group relative min-h-[100px] sm:min-h-[140px] p-2 sm:p-4 rounded-xl sm:rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden ${
+                    className={`group relative min-h-[100px] sm:min-h-[140px] p-2 sm:p-4 rounded-xl sm:rounded-3xl border transition-colors duration-200 cursor-pointer overflow-hidden ${
                       !isCurrentMonth 
-                        ? 'bg-gray-50/30 dark:bg-gray-900/10 border-transparent opacity-30 blur-[0.5px]' 
+                        ? 'bg-gray-50/60 dark:bg-gray-900/20 border-transparent opacity-40' 
                         : isToday
                           ? 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/40 dark:to-gray-800 border-emerald-500 shadow-lg shadow-emerald-500/20 scale-[1.02] z-10'
-                          : 'bg-white/60 dark:bg-gray-800/40 border-white/40 dark:border-gray-700/40 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-xl hover:-translate-y-1 hover:bg-white dark:hover:bg-gray-800 backdrop-blur-sm'
+                          : 'bg-white/70 dark:bg-gray-800/60 border-white/40 dark:border-gray-700/40 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-gray-800'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2 sm:mb-3 relative z-10">
@@ -640,7 +537,7 @@ export default function Dashboard() {
                         {format(day, 'd')}
                       </span>
                       {dayTasks.length > 0 && (
-                        <span className="flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse"></span>
+                        <span className="flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-emerald-500"></span>
                       )}
                     </div>
                     
@@ -672,9 +569,6 @@ export default function Dashboard() {
                       )}
                     </div>
 
-                    {/* Hover indicator gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                    
                     {/* Add indicator on hover - hidden on small screens */}
                     {isCurrentMonth && (
                       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-4 group-hover:translate-x-0 hidden sm:block p-1 bg-emerald-50 dark:bg-emerald-900/50 rounded-full">
@@ -693,18 +587,10 @@ export default function Dashboard() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 dark:selection:bg-emerald-900 dark:selection:text-emerald-100 transition-colors duration-300 relative overflow-hidden">
-      {/* Background Decorations */}
+      {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="bg-blob bg-blob-1 absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-emerald-200/30 dark:bg-emerald-900/20 rounded-full blur-[100px]" />
-        <div className="bg-blob bg-blob-2 absolute top-[20%] -right-[5%] w-[35%] h-[35%] bg-teal-200/30 dark:bg-teal-900/20 rounded-full blur-[100px]" />
-        <div className="bg-blob bg-blob-3 absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] bg-lime-200/30 dark:bg-lime-900/20 rounded-full blur-[100px]" />
-        
-        {/* Extra decorative blobs */}
-        <div className="bg-blob absolute top-[40%] left-[40%] w-[15%] h-[15%] bg-emerald-100/20 dark:bg-emerald-800/10 rounded-full blur-[60px]" />
-        
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.05] pointer-events-none" />
-        <div className="absolute inset-0 bg-noise opacity-[0.02] dark:opacity-[0.03] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent dark:via-black/20 pointer-events-none" />
+        <div className="absolute -top-[15%] -left-[5%] w-[45%] h-[45%] bg-emerald-200/30 dark:bg-emerald-900/30 rounded-full blur-[90px]" />
+        <div className="absolute bottom-[-10%] right-[5%] w-[35%] h-[35%] bg-teal-200/30 dark:bg-teal-900/30 rounded-full blur-[90px]" />
       </div>
 
       {/* Navbar */}
@@ -819,14 +705,12 @@ export default function Dashboard() {
         {/* Bento Grid Dashboard */}
         <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 dashboard-control perspective-1000">
           {/* Welcome Card - Spans 2 cols */}
-          <div className="md:col-span-2 bg-gradient-to-br from-emerald-50/80 via-white/50 to-emerald-100/50 dark:from-gray-800/90 dark:via-gray-800/50 dark:to-emerald-900/20 backdrop-blur-2xl p-6 sm:p-8 rounded-[2.5rem] border border-white/60 dark:border-gray-700/60 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 relative overflow-hidden group hover:scale-[1.01]">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-[80px] -mr-32 -mt-32 transition-all duration-700 group-hover:bg-emerald-400/30 group-hover:scale-110"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-[60px] -ml-20 -mb-20 transition-all duration-700 group-hover:bg-teal-400/20"></div>
+          <div className="md:col-span-2 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-800 dark:via-gray-800 dark:to-emerald-900 p-6 sm:p-8 rounded-[2.5rem] border border-white/50 dark:border-gray-700/60 shadow-lg transition-colors duration-300 relative overflow-hidden">
             
             <div className="relative z-10 flex flex-col justify-between h-full">
               <div>
-                <h3 className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <span className="p-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg"><Clock size={14} /></span>
+                <h3 className="text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <span className="p-1 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg"><Clock size={14} /></span>
                   {format(new Date(), 'EEEE, d MMMM', { locale: es })}
                 </h3>
                 <h2 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight leading-tight">
@@ -838,15 +722,15 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <div className="flex -space-x-4 hover:space-x-1 transition-all duration-300">
+                <div className="flex -space-x-4">
                   {[1,2,3].map(i => (
                     <div key={i} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-white dark:border-gray-800 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs font-bold text-gray-500 shadow-lg transform hover:-translate-y-1 transition-transform">
                       <User size={18} />
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 px-4 py-2 bg-white/50 dark:bg-gray-700/50 rounded-full border border-white/20 backdrop-blur-md shadow-sm">
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
+                <div className="flex items-center text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 px-4 py-2 bg-white/70 dark:bg-gray-700/70 rounded-full border border-white/30 shadow-sm">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
                   Equipo MindSender
                 </div>
               </div>
@@ -856,15 +740,14 @@ export default function Dashboard() {
           {/* Sender AI Card - Vertical */}
           <div 
             onClick={() => setIsAIOpen(true)}
-            className="md:row-span-2 bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-xl shadow-teal-500/20 relative overflow-hidden group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:shadow-teal-500/40 hover:-translate-y-2 hover:scale-[1.02]"
+            className="md:row-span-2 bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
           >
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay"></div>
-            <div className="absolute -bottom-12 -right-12 w-56 h-56 bg-teal-400/30 rounded-full blur-3xl group-hover:bg-teal-400/50 transition-all duration-500 animate-pulse-slow"></div>
+            <div className="absolute -bottom-12 -right-12 w-56 h-56 bg-teal-400/30 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 left-1/2 w-full h-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
             
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div className="flex justify-between items-start">
-                <div className="p-3.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-inner group-hover:rotate-12 transition-transform duration-300">
+                <div className="p-3.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-inner">
                   <Bot size={32} className="text-white drop-shadow-lg" />
                 </div>
                 <span className="px-3 py-1 bg-black/20 backdrop-blur-md rounded-full text-[10px] font-bold border border-white/10 text-teal-100 uppercase tracking-wider">Beta 1.1</span>
@@ -876,12 +759,9 @@ export default function Dashboard() {
                   Tu asistente inteligente personal. Organiza, pregunta y optimiza tu tiempo con IA.
                 </p>
                 
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/10 group-hover:bg-white/20 transition-all shadow-lg">
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/10 shadow-lg">
                   <div className="flex items-center gap-3 text-sm text-teal-50 font-medium">
-                    <div className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </div>
+                    <span className="inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
                     <span>¿En qué puedo ayudarte hoy?</span>
                   </div>
                 </div>
@@ -890,9 +770,9 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats / Action */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/50 dark:border-gray-700/50 shadow-xl flex flex-col justify-between group hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:scale-[1.02]">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/50 dark:border-gray-700/50 shadow-lg flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-lime-100 dark:bg-lime-900/30 text-lime-600 dark:text-lime-400 rounded-2xl group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-lime-100 dark:bg-lime-900/30 text-lime-600 dark:text-lime-400 rounded-2xl">
                 <Activity size={24} />
               </div>
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-lg">Diario</span>
@@ -906,30 +786,23 @@ export default function Dashboard() {
               </div>
               <div className="w-full bg-gray-100 dark:bg-gray-700 h-3 rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className="h-full bg-gradient-to-r from-lime-500 to-emerald-500 rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+                  className="h-full bg-gradient-to-r from-lime-500 to-emerald-500 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${(tasks.filter(t => t.is_completed).length / (tasks.length || 1)) * 100}%` }}
-                >
-                    <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
-                </div>
+                />
               </div>
             </div>
           </div>
           
            {/* Add Task Quick Button */}
            <button 
-            ref={addTaskBtnRef}
-            onClick={() => {
-              setAnimatingFromButton(true);
-              onDateClick(new Date());
-            }}
-            className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-emerald-600 dark:to-teal-600 text-white p-6 rounded-[2.5rem] shadow-xl flex items-center justify-between group hover:bg-black dark:hover:bg-emerald-500 transition-all duration-300 relative overflow-hidden hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/20"
+            onClick={() => onDateClick(new Date())}
+            className="bg-gray-900 dark:bg-emerald-600 text-white p-6 rounded-[2.5rem] shadow-lg flex items-center justify-between transition-colors duration-300 relative overflow-hidden hover:bg-black dark:hover:bg-emerald-500"
            >
-             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
              <div className="flex flex-col items-start relative z-10">
                <span className="text-xl font-bold tracking-tight">Nueva Tarea</span>
-               <span className="text-sm text-gray-400 dark:text-emerald-100 group-hover:text-white transition-colors">Crear recordatorio</span>
+               <span className="text-sm text-gray-400 dark:text-emerald-100">Crear recordatorio</span>
              </div>
-             <div className="p-4 bg-white/10 rounded-full group-hover:bg-white/20 transition-all group-hover:rotate-90 duration-500 shadow-lg backdrop-blur-sm border border-white/10">
+             <div className="p-4 bg-white/10 rounded-full shadow-lg backdrop-blur-sm border border-white/10">
                <Plus size={24} />
              </div>
            </button>
