@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [plan, setPlan] = useState<'free' | 'pro' | 'elite'>('free');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'agenda' | 'memberships'>('agenda');
 
   // Creative Header State
   const [mantraIndex, setMantraIndex] = useState(() => {
@@ -86,7 +87,6 @@ export default function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const appointmentsRef = useRef<HTMLDivElement>(null);
-  const membershipsRef = useRef<HTMLDivElement>(null);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -744,20 +744,29 @@ export default function Dashboard() {
         </div>
 
         {/* Layout con barra izquierda */}
+        {activeTab === 'agenda' && (
         <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6 dashboard-control">
           <div className="md:col-span-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 dark:border-gray-700/50 shadow-lg flex flex-col gap-4">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">Panel</h3>
             <button
-              onClick={() => calendarRef.current?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full text-left px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-bold"
+              onClick={() => setActiveTab('agenda')}
+              className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
+                activeTab === 'agenda'
+                  ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
             >
               Agenda
             </button>
             <button
-              onClick={() => membershipsRef.current?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full text-left px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-bold"
+              onClick={() => setActiveTab('memberships')}
+              className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
+                activeTab === 'memberships'
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
             >
-              Ver membresías
+              Membresías
             </button>
             <button
               onClick={() => {
@@ -919,50 +928,53 @@ export default function Dashboard() {
              </div>
            </button>
         </div>
+        )}
 
         {/* Sección de Suscripciones */}
-        <section ref={membershipsRef} className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-control">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
-            <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
-              Plan Pro
-            </h3>
-            <p className="text-3xl font-black text-gray-900 dark:text-white mb-1">$4 USD</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">al mes</p>
-            <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 mb-6">
-              <li>• Acceso al panel de Citas</li>
-              <li>• Hablar de tus proyectos con el desarrollador</li>
-              <li>• Ayuda con programas locales o tareas</li>
-            </ul>
-            <button
-              className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors"
-              onClick={() => {
-                window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Pro%20de%20MindSender', '_blank');
-              }}
-            >
-              Me interesa el Plan Pro
-            </button>
-          </div>
-          <div className="bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
-            <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-2">
-              Plan Elite
-            </h3>
-            <p className="text-3xl font-black text-white mb-1">$10 USD</p>
-            <p className="text-xs text-gray-400 mb-4">al mes</p>
-            <ul className="text-sm text-gray-200 space-y-2 mb-6">
-              <li>• Todo lo del Plan Pro</li>
-              <li>• Acceso al panel de administrador</li>
-              <li>• Ayuda directa con el código de MindSender</li>
-            </ul>
-            <button
-              className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
-              onClick={() => {
-                window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender', '_blank');
-              }}
-            >
-              Me interesa el Plan Elite
-            </button>
-          </div>
-        </section>
+        {activeTab === 'memberships' && (
+          <section className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-control">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
+              <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
+                Plan Pro
+              </h3>
+              <p className="text-3xl font-black text-gray-900 dark:text-white mb-1">$4 USD</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">al mes</p>
+              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 mb-6">
+                <li>• Acceso al panel de Citas</li>
+                <li>• Hablar de tus proyectos con el desarrollador</li>
+                <li>• Ayuda con programas locales o tareas</li>
+              </ul>
+              <button
+                className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors"
+                onClick={() => {
+                  window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Pro%20de%20MindSender', '_blank');
+                }}
+              >
+                Me interesa el Plan Pro
+              </button>
+            </div>
+            <div className="bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
+              <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-2">
+                Plan Elite
+              </h3>
+              <p className="text-3xl font-black text-white mb-1">$10 USD</p>
+              <p className="text-xs text-gray-400 mb-4">al mes</p>
+              <ul className="text-sm text-gray-200 space-y-2 mb-6">
+                <li>• Todo lo del Plan Pro</li>
+                <li>• Acceso al panel de administrador</li>
+                <li>• Ayuda directa con el código de MindSender</li>
+              </ul>
+              <button
+                className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
+                onClick={() => {
+                  window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender', '_blank');
+                }}
+              >
+                Me interesa el Plan Elite
+              </button>
+            </div>
+          </section>
+        )}
 
         <div ref={calendarRef}>{renderCalendar()}</div>
       </main>
