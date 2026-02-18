@@ -50,6 +50,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
   const [isDev, setIsDev] = useState(false);
+  const [plan, setPlan] = useState<'free' | 'pro' | 'elite'>('free');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -85,6 +86,7 @@ export default function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const appointmentsRef = useRef<HTMLDivElement>(null);
+  const membershipsRef = useRef<HTMLDivElement>(null);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -97,15 +99,52 @@ export default function Dashboard() {
     if (data) setTasks(data);
   };
 
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('full_name, plan, role')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return;
+    }
+
+    if (data) {
+      if (data.full_name) {
+        setUserName(data.full_name);
+      }
+
+      if (data.plan === 'pro' || data.plan === 'elite') {
+        setPlan(data.plan);
+      } else {
+        setPlan('free');
+      }
+
+      if (data.role === 'admin') {
+        setIsDev(true);
+      }
+    }
+  };
+
   useEffect(() => {
     if (user?.user_metadata) {
       setUserName(user.user_metadata.full_name || user.email?.split('@')[0] || 'Usuario');
       setAvatarUrl(user.user_metadata.avatar_url || null);
       setIsDev(user.user_metadata.role === 'admin'); 
+      if (user.user_metadata.plan === 'pro' || user.user_metadata.plan === 'elite') {
+        setPlan(user.user_metadata.plan);
+      } else {
+        setPlan('free');
+      }
     }
     
     if (user) {
       fetchTasks();
+      fetchProfile();
     }
 
     const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
@@ -715,21 +754,27 @@ export default function Dashboard() {
               Agenda
             </button>
             <button
+              onClick={() => membershipsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full text-left px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-bold"
+            >
+              Ver membresías
+            </button>
+            <button
               onClick={() => {
-                if (isDev) {
+                if (isDev || plan === 'pro' || plan === 'elite') {
                   appointmentsRef.current?.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                  alert('Disponible solo para administrador. Próximamente Premium.');
+                  alert('Requiere suscripción Pro para usar Citas.');
                 }
               }}
               className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
-                isDev
+                isDev || plan === 'pro' || plan === 'elite'
                   ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
               }`}
-              title={isDev ? 'Citas' : 'Citas (Premium pronto)'}
+              title="Citas (incluido en plan Pro y Elite)"
             >
-              Citas {isDev ? '' : '(Premium)'}
+              Citas {plan === 'free' && !isDev ? '(Pro)' : ''}
             </button>
             <button
               onClick={() => setIsAIOpen(true)}
@@ -809,17 +854,19 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {isDev && (
+          {(isDev || plan === 'pro' || plan === 'elite') && (
             <div
               ref={appointmentsRef}
               className="md:col-span-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/50 dark:border-gray-700/50 shadow-lg"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Citas</h3>
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Admin</span>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                  {isDev && plan === 'elite' ? 'Admin · Elite' : isDev ? 'Admin' : 'Pro'}
+                </span>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Panel de citas reservado para administrador. Integración de Premium se añadirá más adelante.
+                Agenda sesiones uno a uno para hablar de proyectos, tareas o programas locales.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
@@ -872,6 +919,50 @@ export default function Dashboard() {
              </div>
            </button>
         </div>
+
+        {/* Sección de Suscripciones */}
+        <section ref={membershipsRef} className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-control">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
+            <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
+              Plan Pro
+            </h3>
+            <p className="text-3xl font-black text-gray-900 dark:text-white mb-1">$4 USD</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">al mes</p>
+            <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 mb-6">
+              <li>• Acceso al panel de Citas</li>
+              <li>• Hablar de tus proyectos con el desarrollador</li>
+              <li>• Ayuda con programas locales o tareas</li>
+            </ul>
+            <button
+              className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors"
+              onClick={() => {
+                window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Pro%20de%20MindSender', '_blank');
+              }}
+            >
+              Me interesa el Plan Pro
+            </button>
+          </div>
+          <div className="bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
+            <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-2">
+              Plan Elite
+            </h3>
+            <p className="text-3xl font-black text-white mb-1">$10 USD</p>
+            <p className="text-xs text-gray-400 mb-4">al mes</p>
+            <ul className="text-sm text-gray-200 space-y-2 mb-6">
+              <li>• Todo lo del Plan Pro</li>
+              <li>• Acceso al panel de administrador</li>
+              <li>• Ayuda directa con el código de MindSender</li>
+            </ul>
+            <button
+              className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
+              onClick={() => {
+                window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender', '_blank');
+              }}
+            >
+              Me interesa el Plan Elite
+            </button>
+          </div>
+        </section>
 
         <div ref={calendarRef}>{renderCalendar()}</div>
       </main>
