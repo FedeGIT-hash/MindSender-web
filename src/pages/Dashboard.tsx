@@ -56,6 +56,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<'agenda' | 'memberships'>('agenda');
   const isAgendaTab = activeTab === 'agenda';
   const isMembershipsTab = activeTab === 'memberships';
+  const proCheckoutUrl = import.meta.env.VITE_STRIPE_PRO_LINK as string | undefined;
+  const eliteCheckoutUrl = import.meta.env.VITE_STRIPE_ELITE_LINK as string | undefined;
 
   // Creative Header State
   const [mantraIndex, setMantraIndex] = useState(() => {
@@ -73,6 +75,16 @@ export default function Dashboard() {
   useEffect(() => {
     localStorage.setItem('mindSender_currentMode', mantraIndex.toString());
   }, [mantraIndex]);
+
+  useEffect(() => {
+    if (activeTab === 'memberships') {
+      gsap.fromTo(
+        '.membership-card',
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, [activeTab]);
 
   const cycleMantra = () => {
     setMantraIndex((prev) => (prev + 1) % mantras.length);
@@ -947,7 +959,7 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
+              <div className="membership-card bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
               <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
                 Plan Pro
               </h3>
@@ -961,13 +973,14 @@ export default function Dashboard() {
               <button
                 className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors"
                 onClick={() => {
-                  window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Pro%20de%20MindSender', '_blank');
+                  const url = proCheckoutUrl || 'https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Pro%20de%20MindSender';
+                  window.open(url, '_blank');
                 }}
               >
                 Me interesa el Plan Pro
               </button>
             </div>
-              <div className="bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
+              <div className="membership-card bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
                 <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-2">
                   Plan Elite
                 </h3>
@@ -981,7 +994,8 @@ export default function Dashboard() {
                 <button
                   className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
                   onClick={() => {
-                    window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender', '_blank');
+                    const url = eliteCheckoutUrl || 'https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender';
+                    window.open(url, '_blank');
                   }}
                 >
                   Me interesa el Plan Elite
