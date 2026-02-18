@@ -56,8 +56,12 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<'agenda' | 'memberships'>('agenda');
   const isAgendaTab = activeTab === 'agenda';
   const isMembershipsTab = activeTab === 'memberships';
-  const proCheckoutUrl = import.meta.env.VITE_STRIPE_PRO_LINK as string | undefined;
-  const eliteCheckoutUrl = import.meta.env.VITE_STRIPE_ELITE_LINK as string | undefined;
+  const proCheckoutUrl =
+    import.meta.env.VITE_STRIPE_PRO_LINK ||
+    'https://buy.stripe.com/test_3cIaEQ2lj7j81RicWN4ko00';
+  const eliteCheckoutUrl =
+    import.meta.env.VITE_STRIPE_ELITE_LINK ||
+    'https://buy.stripe.com/test_14AcMY2ljavk0Ne1e54ko01';
 
   // Creative Header State
   const [mantraIndex, setMantraIndex] = useState(() => {
@@ -973,8 +977,7 @@ export default function Dashboard() {
               <button
                 className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors"
                 onClick={() => {
-                  const url = proCheckoutUrl || 'https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Pro%20de%20MindSender';
-                  window.open(url, '_blank');
+                  window.open(proCheckoutUrl, '_blank');
                 }}
               >
                 Me interesa el Plan Pro
@@ -994,8 +997,7 @@ export default function Dashboard() {
                 <button
                   className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
                   onClick={() => {
-                    const url = eliteCheckoutUrl || 'https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender';
-                    window.open(url, '_blank');
+                    window.open(eliteCheckoutUrl, '_blank');
                   }}
                 >
                   Me interesa el Plan Elite
