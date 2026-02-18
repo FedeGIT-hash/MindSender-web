@@ -83,6 +83,8 @@ export default function Dashboard() {
   const headerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const appointmentsRef = useRef<HTMLDivElement>(null);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -702,10 +704,48 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Bento Grid Dashboard */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 dashboard-control perspective-1000">
+        {/* Layout con barra izquierda */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6 dashboard-control">
+          <div className="md:col-span-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 dark:border-gray-700/50 shadow-lg flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">Panel</h3>
+            <button
+              onClick={() => calendarRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full text-left px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-bold"
+            >
+              Agenda
+            </button>
+            <button
+              onClick={() => {
+                if (isDev) {
+                  appointmentsRef.current?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  alert('Disponible solo para administrador. Próximamente Premium.');
+                }
+              }}
+              className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
+                isDev
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+              }`}
+              title={isDev ? 'Citas' : 'Citas (Premium pronto)'}
+            >
+              Citas {isDev ? '' : '(Premium)'}
+            </button>
+            <button
+              onClick={() => setIsAIOpen(true)}
+              className="w-full text-left px-4 py-3 rounded-xl bg-teal-600 text-white hover:bg-teal-500 transition-colors font-bold"
+            >
+              Sender AI
+            </button>
+            <button
+              onClick={openSettings}
+              className="w-full text-left px-4 py-3 rounded-xl bg-gray-900 dark:bg-gray-700 text-white hover:bg-black dark:hover:bg-gray-600 transition-colors font-bold"
+            >
+              Configuración
+            </button>
+          </div>
           {/* Welcome Card - Spans 2 cols */}
-          <div className="md:col-span-2 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-800 dark:via-gray-800 dark:to-emerald-900 p-6 sm:p-8 rounded-[2.5rem] border border-white/50 dark:border-gray-700/60 shadow-lg transition-colors duration-300 relative overflow-hidden">
+          <div className="md:col-span-3 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-800 dark:via-gray-800 dark:to-emerald-900 p-6 sm:p-8 rounded-[2.5rem] border border-white/50 dark:border-gray-700/60 shadow-lg transition-colors duration-300 relative overflow-hidden">
             
             <div className="relative z-10 flex flex-col justify-between h-full">
               <div>
@@ -737,10 +777,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Sender AI Card - Vertical */}
+          {/* Sender AI Card */}
           <div 
             onClick={() => setIsAIOpen(true)}
-            className="md:row-span-2 bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+            className="bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
           >
             <div className="absolute -bottom-12 -right-12 w-56 h-56 bg-teal-400/30 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 left-1/2 w-full h-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
@@ -768,6 +808,31 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+          
+          {isDev && (
+            <div
+              ref={appointmentsRef}
+              className="md:col-span-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/50 dark:border-gray-700/50 shadow-lg"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Citas</h3>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Admin</span>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Panel de citas reservado para administrador. Integración de Premium se añadirá más adelante.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
+                  <p className="text-xs font-bold text-gray-600 dark:text-gray-300">Próxima cita</p>
+                  <p className="text-sm text-gray-900 dark:text-white mt-1">Sin datos aún</p>
+                </div>
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
+                  <p className="text-xs font-bold text-gray-600 dark:text-gray-300">Resumen semanal</p>
+                  <p className="text-sm text-gray-900 dark:text-white mt-1">0 citas</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Quick Stats / Action */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/50 dark:border-gray-700/50 shadow-lg flex flex-col justify-between">
@@ -808,7 +873,7 @@ export default function Dashboard() {
            </button>
         </div>
 
-        {renderCalendar()}
+        <div ref={calendarRef}>{renderCalendar()}</div>
       </main>
 
       {/* Settings Panel - Side Drawer */}
