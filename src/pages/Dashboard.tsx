@@ -934,8 +934,20 @@ export default function Dashboard() {
 
         {/* Sección de Suscripciones */}
         {activeTab === 'memberships' && (
-          <section className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-control">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
+          <section className="mb-10 dashboard-control">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                Membresías MindSender
+              </h2>
+              <button
+                onClick={() => setActiveTab('agenda')}
+                className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 underline underline-offset-4"
+              >
+                Volver a la agenda
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-[2rem] border border-white/50 dark:border-gray-700/50 p-6 shadow-lg">
               <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
                 Plan Pro
               </h3>
@@ -955,25 +967,26 @@ export default function Dashboard() {
                 Me interesa el Plan Pro
               </button>
             </div>
-            <div className="bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
-              <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-2">
-                Plan Elite
-              </h3>
-              <p className="text-3xl font-black text-white mb-1">$10 USD</p>
-              <p className="text-xs text-gray-400 mb-4">al mes</p>
-              <ul className="text-sm text-gray-200 space-y-2 mb-6">
-                <li>• Todo lo del Plan Pro</li>
-                <li>• Acceso al panel de administrador</li>
-                <li>• Ayuda directa con el código de MindSender</li>
-              </ul>
-              <button
-                className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
-                onClick={() => {
-                  window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender', '_blank');
-                }}
-              >
-                Me interesa el Plan Elite
-              </button>
+              <div className="bg-gray-900 dark:bg-black/90 rounded-[2rem] border border-gray-800 p-6 shadow-xl">
+                <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-2">
+                  Plan Elite
+                </h3>
+                <p className="text-3xl font-black text-white mb-1">$10 USD</p>
+                <p className="text-xs text-gray-400 mb-4">al mes</p>
+                <ul className="text-sm text-gray-200 space-y-2 mb-6">
+                  <li>• Todo lo del Plan Pro</li>
+                  <li>• Acceso al panel de administrador</li>
+                  <li>• Ayuda directa con el código de MindSender</li>
+                </ul>
+                <button
+                  className="w-full px-4 py-3 rounded-xl bg-amber-500 text-gray-900 font-bold hover:bg-amber-400 transition-colors"
+                  onClick={() => {
+                    window.open('https://wa.me/?text=Hola,%20quiero%20suscribirme%20al%20plan%20Elite%20de%20MindSender', '_blank');
+                  }}
+                >
+                  Me interesa el Plan Elite
+                </button>
+              </div>
             </div>
           </section>
         )}
