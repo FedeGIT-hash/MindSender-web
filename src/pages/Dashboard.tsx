@@ -44,7 +44,7 @@ export default function Dashboard() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [notifications] = useState([
     { id: 1, title: 'Bienvenido', message: 'Gracias por usar MindSender Beta. ¡Disfruta organizando!', type: 'info', time: 'Ahora' },
-    { id: 2, title: 'Sistema Actualizado', message: 'Hemos añadido modo oscuro y mejoras visuales.', type: 'system', time: 'Hace 5m' }
+    { id: 2, title: 'Sistema Actualizado', message: 'Recien actualizado.', type: 'system', time: 'Hace 5m' }
   ]);
   const [newTask, setNewTask] = useState({ subject: '', description: '', due_time: '12:00' });
   const [loading, setLoading] = useState(false);
@@ -76,6 +76,7 @@ export default function Dashboard() {
     { text: "Focus Total", icon: <Zap size={14} className="text-yellow-400" /> },
     { text: "Flow State", icon: <Brain size={14} className="text-violet-400" /> },
     { text: "Break Time", icon: <Coffee size={14} className="text-emerald-400" /> },
+    { text: "Descanso", icon: <CheckCircle2 size={11} className="text-purple-400" /> },
   ];
 
   useEffect(() => {
@@ -285,7 +286,6 @@ export default function Dashboard() {
       if (modalRef.current && overlayRef.current) {
         gsap.set(modalRef.current, { scale: 0.96, opacity: 0, y: 12 });
         gsap.set(overlayRef.current, { opacity: 0 });
-        
         gsap.to(overlayRef.current, { opacity: 1, duration: 0.2, ease: 'power2.out' });
         gsap.to(modalRef.current, { 
           scale: 1, 
@@ -906,6 +906,11 @@ export default function Dashboard() {
                   <p className="text-xs font-bold text-gray-600 dark:text-gray-300">Resumen semanal</p>
                   <p className="text-sm text-gray-900 dark:text-white mt-1">0 citas</p>
                 </div>
+              </div>
+              <div className="mt-4">
+                <button className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20">
+                  Confirmar Cita
+                </button>
               </div>
             </div>
           )}
