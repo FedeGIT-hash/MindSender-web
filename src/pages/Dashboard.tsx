@@ -684,6 +684,11 @@ export default function Dashboard() {
   return (
     <div ref={containerRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 dark:selection:bg-emerald-900 dark:selection:text-emerald-100 transition-colors duration-300 relative overflow-hidden">
       {/* Background */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-10 pointer-events-none"
+        style={{ backgroundImage: "url('/fondito.png')" }}
+      />
+      
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute -top-[15%] -left-[5%] w-[45%] h-[45%] bg-emerald-200/30 dark:bg-emerald-900/30 rounded-full blur-[90px]" />
         <div className="absolute bottom-[-10%] right-[5%] w-[35%] h-[35%] bg-teal-200/30 dark:bg-teal-900/30 rounded-full blur-[90px]" />
