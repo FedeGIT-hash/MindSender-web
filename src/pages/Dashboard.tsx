@@ -23,7 +23,6 @@ import { useTheme } from '../context/ThemeContext';
 
 import { Link } from 'react-router-dom';
 import { lightFormat } from 'date-fns/lightFormat';
-import { div, s } from 'framer-motion/client';
 
 interface Task {
   id: string;
