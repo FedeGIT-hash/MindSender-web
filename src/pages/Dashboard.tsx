@@ -800,7 +800,7 @@ export default function Dashboard() {
           <button
             ref={liquidBtnRef}
             onClick={handleLiquidClick}
-            className="px-6 py-3 rounded-2xl bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-700/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] text-gray-900 dark:text-white font-bold transition-all hover:bg-white/30 dark:hover:bg-gray-700/30 hover:scale-105 active:scale-95"
+            className="fixed top-28 right-6 sm:top-32 sm:right-10 z-40 px-6 py-3 rounded-2xl bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-700/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] text-gray-900 dark:text-white font-bold transition-all hover:bg-white/30 dark:hover:bg-gray-700/30 hover:scale-105 active:scale-95"
           >
             {liquidText}
           </button>
