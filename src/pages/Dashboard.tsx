@@ -559,122 +559,100 @@ export default function Dashboard() {
   const renderCalendar = () => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart, { locale: es });
-    const endDate = endOfWeek(monthEnd, { locale: es });
-    const days = eachDayOfInterval({ start: startDate, end: endDate });
-
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 0 }); // Domingo
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 });
     const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
+    const days = eachDayOfInterval({
+      start: startDate,
+      end: endDate,
+    });
+
     return (
-      <div className="calendar-card bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-[2.5rem] shadow-xl border border-white/60 dark:border-gray-700/60 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] dark:hover:shadow-[0_20px_60px_rgba(16,185,129,0.2)] group">
+      <div className="calendar-card bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         {/* Calendar Header */}
-        <div className="flex justify-between items-center p-6 sm:p-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500 dark:from-emerald-900 dark:via-emerald-800 dark:to-green-900 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/20 rounded-full blur-3xl"></div>
-          
-          <div className="flex items-center gap-4 sm:gap-6 relative z-10">
-            <div className="p-3 sm:p-4 bg-white/20 rounded-2xl sm:rounded-[1.5rem] backdrop-blur-xl border border-white/30 shadow-inner group-hover:scale-105 transition-transform duration-300">
-              <h2 className="text-2xl sm:text-4xl font-black capitalize tracking-tight leading-none mb-1 drop-shadow-sm">
-                {format(currentDate, 'MMMM', { locale: es })}
-              </h2>
-              <span className="text-emerald-50 text-[10px] sm:text-sm font-bold tracking-[0.2em] uppercase opacity-90">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold capitalize text-gray-900 dark:text-white flex items-center gap-2">
+              {format(currentDate, 'MMMM', { locale: es })}
+              <span className="text-gray-400 font-normal text-lg">
                 {format(currentDate, 'yyyy', { locale: es })}
               </span>
-            </div>
+            </h2>
           </div>
-          <div className="flex gap-2 sm:gap-3 relative z-10">
-            <button onClick={handlePrevMonth} className="p-3 sm:p-4 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group/btn shadow-lg hover:shadow-xl">
-              <ChevronLeft size={20} className="sm:w-6 sm:h-6 group-hover/btn:-translate-x-1 transition-transform" />
+          <div className="flex gap-1">
+            <button onClick={handlePrevMonth} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-600 dark:text-gray-300">
+              <ChevronLeft size={20} />
             </button>
-            <button onClick={handleNextMonth} className="p-3 sm:p-4 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all active:scale-90 backdrop-blur-md border border-white/10 hover:border-white/30 group/btn shadow-lg hover:shadow-xl">
-              <ChevronRight size={20} className="sm:w-6 sm:h-6 group-hover/btn:translate-x-1 transition-transform" />
+            <button onClick={handleNextMonth} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-600 dark:text-gray-300">
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>
 
-        <div className="p-4 sm:p-8 bg-gradient-to-b from-white/50 to-white/20 dark:from-gray-800/50 dark:to-gray-900/50">
-          <div className="calendar-grid-content">
-            {/* Weekdays */}
-            <div className="grid grid-cols-7 gap-1 sm:gap-4 mb-4 sm:mb-6">
-              {weekDays.map((day) => (
-                <div key={day} className="text-center text-[10px] sm:text-xs font-black text-emerald-600/60 dark:text-emerald-400/60 uppercase tracking-[0.1em] sm:tracking-[0.2em]">
-                  {day}
-                </div>
-              ))}
-            </div>
+        <div className="bg-white dark:bg-gray-900">
+          {/* Weekdays */}
+          <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700">
+            {weekDays.map((day) => (
+              <div key={day} className="py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                {day}
+              </div>
+            ))}
+          </div>
 
-            {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-1 sm:gap-4">
-              {days.map((day, idx) => {
-                const isCurrentMonth = isSameMonth(day, monthStart);
-                const isToday = isSameDay(day, new Date());
-                const dayTasks = tasks.filter(task => isSameDay(new Date(task.due_date), day));
-                
-                return (
-                  <div 
-                    key={idx}
-                    onClick={() => onDateClick(day)}
-                    className={`group relative min-h-[100px] sm:min-h-[140px] p-2 sm:p-4 rounded-xl sm:rounded-3xl border transition-colors duration-200 cursor-pointer overflow-hidden ${
-                      !isCurrentMonth 
-                        ? 'bg-gray-50/60 dark:bg-gray-900/20 border-transparent opacity-40' 
-                        : isToday
-                          ? 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/40 dark:to-gray-800 border-emerald-500 shadow-lg shadow-emerald-500/20 scale-[1.02] z-10'
-                          : 'bg-white/70 dark:bg-gray-800/60 border-white/40 dark:border-gray-700/40 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-2 sm:mb-3 relative z-10">
-                      <span className={`text-base sm:text-2xl font-black transition-colors ${
-                        isToday 
-                          ? 'text-emerald-600 dark:text-emerald-400' 
-                          : isCurrentMonth 
-                            ? 'text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400' 
-                            : 'text-gray-400 dark:text-gray-600'
-                      }`}>
-                        {format(day, 'd')}
-                      </span>
-                      {dayTasks.length > 0 && (
-                        <span className="flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-emerald-500"></span>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-1 sm:space-y-2 relative z-10">
-                      {dayTasks.slice(0, 2).map((task) => (
-                        <div 
-                          key={task.id}
-                          onClick={(e) => handleEditTask(task, e)}
-                          className={`text-[9px] sm:text-[11px] p-1.5 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-200 flex flex-col gap-0.5 group/task ${
-                            task.is_completed 
-                              ? 'bg-gray-100/50 dark:bg-gray-700/30 border-transparent text-gray-400 line-through' 
-                              : 'bg-emerald-50/80 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 font-bold hover:scale-105 hover:shadow-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            {task.is_completed ? <CheckCircle2 size={12} className="text-gray-400" /> : <Circle size={12} className="text-emerald-500 group-hover/task:fill-emerald-500 transition-colors" />}
-                            <span className="truncate">{task.subject}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-[8px] sm:text-[9px] opacity-70 pl-0.5">
-                            <Clock size={8} className="sm:w-3 sm:h-3" />
-                            <span>{format(new Date(task.due_date), 'HH:mm')}</span>
-                          </div>
-                        </div>
-                      ))}
-                      {dayTasks.length > 2 && (
-                        <div className="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 font-bold pl-1 sm:pl-2 group-hover:text-emerald-500 transition-colors">
-                          + {dayTasks.length - 2} más
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Add indicator on hover - hidden on small screens */}
-                    {isCurrentMonth && (
-                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 text-emerald-500 transform translate-x-4 group-hover:translate-x-0 hidden sm:block p-1 bg-emerald-50 dark:bg-emerald-900/50 rounded-full">
-                        <Plus size={16} strokeWidth={3} />
+          {/* Days Grid */}
+          <div className="grid grid-cols-7 auto-rows-fr bg-gray-200 dark:bg-gray-700 gap-px border-b border-gray-200 dark:border-gray-700">
+            {days.map((day, idx) => {
+              const isCurrentMonth = isSameMonth(day, monthStart);
+              const isToday = isSameDay(day, new Date());
+              const dayTasks = tasks.filter(task => isSameDay(new Date(task.due_date), day));
+              
+              return (
+                <div 
+                  key={idx}
+                  onClick={() => onDateClick(day)}
+                  className={`relative min-h-[100px] sm:min-h-[120px] p-2 transition-colors cursor-pointer bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                    !isCurrentMonth ? 'bg-gray-50/50 dark:bg-gray-900/50 text-gray-400' : ''
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <span className={`text-sm font-medium h-7 w-7 flex items-center justify-center rounded-full ${
+                      isToday 
+                        ? 'bg-emerald-600 text-white' 
+                        : isCurrentMonth 
+                          ? 'text-gray-700 dark:text-gray-200' 
+                          : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {format(day, 'd')}
+                    </span>
+                    {dayTasks.length > 0 && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mt-1 mr-1"></span>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-1 overflow-hidden">
+                    {dayTasks.slice(0, 3).map((task) => (
+                      <div 
+                        key={task.id}
+                        onClick={(e) => handleEditTask(task, e)}
+                        className={`text-[10px] px-1.5 py-0.5 rounded truncate border ${
+                          task.is_completed 
+                            ? 'bg-gray-100 text-gray-400 border-transparent line-through' 
+                            : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800/30'
+                        }`}
+                      >
+                        {task.subject}
+                      </div>
+                    ))}
+                    {dayTasks.length > 3 && (
+                      <div className="text-[10px] text-gray-400 pl-1">
+                        + {dayTasks.length - 3} más
                       </div>
                     )}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -685,7 +663,7 @@ export default function Dashboard() {
     <div ref={containerRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 dark:selection:bg-emerald-900 dark:selection:text-emerald-100 transition-colors duration-300 relative overflow-hidden">
       {/* Background */}
       <div 
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-10 pointer-events-none"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-50 dark:opacity-40 pointer-events-none"
         style={{ backgroundImage: "url('/fondito.png')" }}
       />
       
