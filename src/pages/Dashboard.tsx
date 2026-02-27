@@ -22,6 +22,8 @@ import SenderAI from '../components/AI/SenderAI';
 import { useTheme } from '../context/ThemeContext';
 
 import { Link } from 'react-router-dom';
+import { lightFormat } from 'date-fns/lightFormat';
+import { div, s } from 'framer-motion/client';
 
 interface Task {
   id: string;
@@ -58,6 +60,34 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<'agenda' | 'memberships'>('agenda');
   const isAgendaTab = activeTab === 'agenda';
   const isMembershipsTab = activeTab === 'memberships';
+
+  // Liquid Button State
+  const [liquidText, setLiquidText] = useState('Botón Prueba');
+  const liquidBtnRef = useRef<HTMLButtonElement>(null);
+
+  const handleLiquidClick = () => {
+    setLiquidText('como estas');
+    if (liquidBtnRef.current) {
+      gsap.to(liquidBtnRef.current, {
+        scaleX: 1.4,
+        scaleY: 0.9,
+        duration: 0.15,
+        ease: "power2.out",
+        onComplete: () => {
+          gsap.to(liquidBtnRef.current, {
+            scaleX: 1,
+            scaleY: 1,
+            duration: 0.8,
+            ease: "elastic.out(1, 0.3)",
+            onComplete: () => {
+               setTimeout(() => setLiquidText('Botón Prueba'), 1000);
+            }
+          });
+        }
+      });
+    }
+  };
+
   const proCheckoutUrl =
     import.meta.env.VITE_STRIPE_PRO_LINK ||
     'https://buy.stripe.com/test_3cIaEQ2lj7j81RicWN4ko00';
@@ -420,6 +450,12 @@ export default function Dashboard() {
     const [hours, minutes] = newTask.due_time.split(':').map(Number);
     const dueDate = setMinutes(setHours(selectedDate, hours), minutes);
 
+  console.log('dueDate:', dueDate);
+  const dueDateISO = dueDate.toISOString();
+  console.log('dueDateISO:', dueDateISO);
+  lightFormat(dueDate, 'yyyy-MM-dd HH:mm:ss');
+  
+
     try {
       if (editingTask) {
         const { data, error } = await supabase
@@ -761,6 +797,14 @@ export default function Dashboard() {
               Organiza tus actividades con precisión y estilo.
             </p>
           </div>
+          
+          <button
+            ref={liquidBtnRef}
+            onClick={handleLiquidClick}
+            className="px-6 py-3 rounded-2xl bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-700/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] text-gray-900 dark:text-white font-bold transition-all hover:bg-white/30 dark:hover:bg-gray-700/30 hover:scale-105 active:scale-95"
+          >
+            {liquidText}
+          </button>
         </div>
 
         {/* Layout con barra izquierda */}
