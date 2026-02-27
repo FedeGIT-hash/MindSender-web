@@ -17,7 +17,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Layout, CreditCard, CalendarCheck } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Layout, CreditCard, CalendarCheck } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import MembershipsSection from '../components/Dashboard/MembershipsSection';
 import { useTheme } from '../context/ThemeContext';
