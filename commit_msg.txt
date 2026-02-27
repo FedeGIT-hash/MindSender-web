@@ -1,0 +1,1 @@
+Feat: Liquid Glass Navigation Oval, removed side panel, added scroll animation

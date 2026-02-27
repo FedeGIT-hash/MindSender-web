@@ -207,6 +207,17 @@ export default function SenderAI({ isOpen, onClose, onTaskAction }: SenderAIProp
             });
           }
 
+          const confirmResult = confirm("¿Deseas confirmar los cambios realizados por la IA?");
+          if (!confirmResult) {
+            setMessages(prev => [...prev, {
+              id: (Date.now() + 3).toString(),
+              role: 'assistant',
+              content: "Operación cancelada por el usuario.",
+              timestamp: new Date()
+            }]);
+            return;
+          }
+
           // Now call the AI again with the tool results
           const secondResponse = await groq.chat.completions.create({
             messages: [

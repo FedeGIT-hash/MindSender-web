@@ -17,7 +17,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Sparkles, Zap, Brain, Coffee } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Sparkles, Zap, Brain, Coffee, Layout, CreditCard, CalendarCheck } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import { useTheme } from '../context/ThemeContext';
 
@@ -60,32 +60,23 @@ export default function Dashboard() {
   const isAgendaTab = activeTab === 'agenda';
   const isMembershipsTab = activeTab === 'memberships';
 
-  // Liquid Button State
-  const [liquidText, setLiquidText] = useState('Botón Prueba');
-  const liquidBtnRef = useRef<HTMLButtonElement>(null);
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const lastScrollY = useRef(0);
 
-  const handleLiquidClick = () => {
-    setLiquidText('como estas');
-    if (liquidBtnRef.current) {
-      gsap.to(liquidBtnRef.current, {
-        scaleX: 1.4,
-        scaleY: 0.9,
-        duration: 0.15,
-        ease: "power2.out",
-        onComplete: () => {
-          gsap.to(liquidBtnRef.current, {
-            scaleX: 1,
-            scaleY: 1,
-            duration: 0.8,
-            ease: "elastic.out(1, 0.3)",
-            onComplete: () => {
-               setTimeout(() => setLiquidText('Botón Prueba'), 1000);
-            }
-          });
-        }
-      });
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current + 20) {
+        setIsNavExpanded(true); // Scrolling down -> Stretch
+      } else if (currentScrollY < lastScrollY.current - 20) {
+        setIsNavExpanded(false); // Scrolling up -> Shrink
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const proCheckoutUrl =
     import.meta.env.VITE_STRIPE_PRO_LINK ||
@@ -779,73 +770,13 @@ export default function Dashboard() {
               Organiza tus actividades con precisión y estilo.
             </p>
           </div>
-          
-          <button
-            ref={liquidBtnRef}
-            onClick={handleLiquidClick}
-            className="fixed top-28 right-6 sm:top-32 sm:right-10 z-40 px-6 py-3 rounded-2xl bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-700/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] text-gray-900 dark:text-white font-bold transition-all hover:bg-white/30 dark:hover:bg-gray-700/30 hover:scale-105 active:scale-95"
-          >
-            {liquidText}
-          </button>
         </div>
 
         {/* Layout con barra izquierda */}
         {activeTab === 'agenda' && (
         <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6 dashboard-control">
-          <div className="md:col-span-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 dark:border-gray-700/50 shadow-lg flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">Panel</h3>
-            <button
-              onClick={() => setActiveTab('agenda')}
-              className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
-                isAgendaTab
-                  ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              Agenda
-            </button>
-            <button
-              onClick={() => setActiveTab('memberships')}
-              className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
-                isMembershipsTab
-                  ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              Membresías
-            </button>
-            <button
-              onClick={() => {
-                if (isDev || plan === 'pro' || plan === 'elite') {
-                  appointmentsRef.current?.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                  alert('Requiere suscripción Pro para usar Citas.');
-                }
-              }}
-              className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${
-                isDev || plan === 'pro' || plan === 'elite'
-                  ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
-              }`}
-              title="Citas (incluido en plan Pro y Elite)"
-            >
-              Citas {plan === 'free' && !isDev ? '(Pro)' : ''}
-            </button>
-            <button
-              onClick={() => setIsAIOpen(true)}
-              className="w-full text-left px-4 py-3 rounded-xl bg-teal-600 text-white hover:bg-teal-500 transition-colors font-bold"
-            >
-              Sender AI
-            </button>
-            <button
-              onClick={openSettings}
-              className="w-full text-left px-4 py-3 rounded-xl bg-gray-900 dark:bg-gray-700 text-white hover:bg-black dark:hover:bg-gray-600 transition-colors font-bold"
-            >
-              Configuración
-            </button>
-          </div>
-          {/* Welcome Card - Spans 2 cols */}
-          <div className="md:col-span-3 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-800 dark:via-gray-800 dark:to-emerald-900 p-6 sm:p-8 rounded-[2.5rem] border border-white/50 dark:border-gray-700/60 shadow-lg transition-colors duration-300 relative overflow-hidden">
+          {/* Welcome Card - Spans 4 cols (Full Width) */}
+          <div className="md:col-span-4 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-800 dark:via-gray-800 dark:to-emerald-900 p-6 sm:p-8 rounded-[2.5rem] border border-white/50 dark:border-gray-700/60 shadow-lg transition-colors duration-300 relative overflow-hidden">
             
             <div className="relative z-10 flex flex-col justify-between h-full">
               <div>
@@ -880,7 +811,7 @@ export default function Dashboard() {
           {/* Sender AI Card */}
           <div 
             onClick={() => setIsAIOpen(true)}
-            className="bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+            className="md:col-span-2 bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-600 dark:from-emerald-900 dark:via-teal-900 dark:to-indigo-900 text-white p-6 sm:p-8 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
           >
             <div className="absolute -bottom-12 -right-12 w-56 h-56 bg-teal-400/30 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 left-1/2 w-full h-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
@@ -1469,6 +1400,80 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Liquid Glass Navigation Oval */}
+      <div 
+        className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+          isNavExpanded 
+            ? 'w-[90%] sm:w-[600px] px-8 py-4 rounded-[2rem] bg-white/40 dark:bg-black/40' 
+            : 'w-auto px-6 py-3 rounded-full bg-white/20 dark:bg-black/20'
+        } backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] flex items-center overflow-hidden`}
+      >
+        <div className={`flex items-center w-full ${isNavExpanded ? 'justify-between' : 'gap-6'}`}>
+           {/* Agenda */}
+           <button 
+             onClick={() => setActiveTab('agenda')}
+             className={`flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${activeTab === 'agenda' ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
+             title="Agenda"
+           >
+             <Layout size={24} />
+             <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
+               Agenda
+             </span>
+           </button>
+
+           {/* Membresías */}
+           <button 
+             onClick={() => setActiveTab('memberships')}
+             className={`flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${activeTab === 'memberships' ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
+             title="Membresías"
+           >
+             <CreditCard size={24} />
+             <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
+               Membresías
+             </span>
+           </button>
+
+           {/* Citas */}
+           <button 
+             onClick={() => {
+                setActiveTab('agenda');
+                setTimeout(() => appointmentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+             }}
+             className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-emerald-600 dark:hover:text-emerald-400"
+             title="Citas"
+           >
+             <CalendarCheck size={24} />
+             <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
+               Citas
+             </span>
+           </button>
+
+           {/* Sender AI */}
+           <button 
+             onClick={() => setIsAIOpen(true)}
+             className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-teal-500"
+             title="Sender AI"
+           >
+             <Bot size={24} />
+             <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
+               Sender AI
+             </span>
+           </button>
+
+           {/* Configuración */}
+           <button 
+             onClick={openSettings}
+             className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-gray-900 dark:hover:text-gray-200"
+             title="Configuración"
+           >
+             <Settings size={24} />
+             <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
+               Configuración
+             </span>
+           </button>
+        </div>
+      </div>
 
       {/* Sender AI Interface */}
       <SenderAI 
