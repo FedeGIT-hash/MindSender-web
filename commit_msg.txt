@@ -1,1 +1,1 @@
-Feat: Liquid Glass Navigation Oval, removed side panel, added scroll animation
+Fix: Build error by removing unused variables & Refactor: Extracted Memberships section
