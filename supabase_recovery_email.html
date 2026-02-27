@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperación de Contraseña - MindSender</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .header {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: white;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .content {
+      padding: 40px 30px;
+      color: #374151;
+    }
+    .greeting {
+      font-size: 20px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 20px;
+    }
+    .message {
+      margin-bottom: 30px;
+      color: #4b5563;
+    }
+    .button-container {
+      text-align: center;
+      margin: 35px 0;
+    }
+    .button {
+      background-color: #10b981;
+      color: white !important;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      display: inline-block;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+      transition: background-color 0.2s;
+    }
+    .button:hover {
+      background-color: #059669;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #9ca3af;
+      border-top: 1px solid #e5e7eb;
+    }
+    .highlight {
+      color: #10b981;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>MindSender</h1>
+    </div>
+    <div class="content">
+      <div class="greeting">Hola,</div>
+      <p class="message">
+        Recibimos una solicitud para restablecer la contraseña de tu cuenta en <span class="highlight">MindSender</span>.
+      </p>
+      <p class="message">
+        Si fuiste tú, puedes crear una nueva contraseña haciendo clic en el siguiente botón:
+      </p>
+      
+      <div class="button-container">
+        <a href="{{ .ConfirmationURL }}" class="button">Restablecer Contraseña</a>
+      </div>
+      
+      <p class="message" style="font-size: 14px; margin-top: 30px;">
+        Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:<br>
+        <span style="color: #10b981; word-break: break-all; font-size: 12px;">{{ .ConfirmationURL }}</span>
+      </p>
+      
+      <p class="message" style="font-size: 14px; color: #6b7280;">
+        Si no solicitaste este cambio, puedes ignorar este correo de forma segura. Tu contraseña no cambiará.
+      </p>
+    </div>
+    <div class="footer">
+      &copy; 2026 MindSender. Todos los derechos reservados.<br>
+      Cd. Obregón, Sonora, México
+    </div>
+  </div>
+</body>
+</html>

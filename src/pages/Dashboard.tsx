@@ -17,7 +17,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import gsap from 'gsap';
-import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Sparkles, Zap, Brain, Coffee, Layout, CreditCard, CalendarCheck } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, LogOut, BookOpen, FileText, CheckCircle2, Circle, Settings, Camera, User, X, Save, Bot, Moon, Sun, Bell, BellRing, AlertTriangle, Info, Clock, Trash2, ShieldCheck, Activity, Layout, CreditCard, CalendarCheck } from 'lucide-react';
 import SenderAI from '../components/AI/SenderAI';
 import MembershipsSection from '../components/Dashboard/MembershipsSection';
 import { useTheme } from '../context/ThemeContext';
@@ -75,27 +75,6 @@ export default function Dashboard() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Creative Header State
-  const [mantraIndex, setMantraIndex] = useState(() => {
-    const saved = localStorage.getItem('mindSender_currentMode');
-    return saved ? parseInt(saved) : 0;
-  });
-
-  const mantras = [
-    { text: "Modo Creativo", icon: <Sparkles size={14} className="text-amber-400" /> },
-    { text: "Focus Total", icon: <Zap size={14} className="text-yellow-400" /> },
-    { text: "Flow State", icon: <Brain size={14} className="text-violet-400" /> },
-    { text: "Break Time", icon: <Coffee size={14} className="text-emerald-400" /> },
-    { text: "Descanso", icon: <CheckCircle2 size={11} className="text-purple-400" /> },
-  ];
-
-  useEffect(() => {
-    localStorage.setItem('mindSender_currentMode', mantraIndex.toString());
-  }, [mantraIndex]);
-
-  const cycleMantra = () => {
-    setMantraIndex((prev) => (prev + 1) % mantras.length);
-  };
 
   const modalRef = useRef<HTMLDivElement>(null);
   const settingsModalRef = useRef<HTMLDivElement>(null);
@@ -103,7 +82,6 @@ export default function Dashboard() {
   const notificationsModalRef = useRef<HTMLDivElement>(null);
   const notificationsOverlayRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -171,11 +149,6 @@ export default function Dashboard() {
     const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
     
     tl.fromTo(
-      headerRef.current,
-      { y: -24, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.5 }
-    )
-      .fromTo(
         '.dashboard-control',
         { y: 16, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.4, stagger: 0.08 },
@@ -634,7 +607,7 @@ export default function Dashboard() {
     <div ref={containerRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 dark:selection:bg-emerald-900 dark:selection:text-emerald-100 transition-colors duration-300 relative overflow-hidden">
       {/* Background */}
       <div 
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-50 dark:opacity-40 pointer-events-none"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-90 dark:opacity-40 pointer-events-none"
         style={{ backgroundImage: "url('/fondito.png')" }}
       />
       
@@ -643,102 +616,8 @@ export default function Dashboard() {
         <div className="absolute bottom-[-10%] right-[5%] w-[35%] h-[35%] bg-teal-200/30 dark:bg-teal-900/30 rounded-full blur-[90px]" />
       </div>
 
-      {/* Navbar */}
-      <nav ref={headerRef} className="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20 sm:h-24">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="relative">
-                {avatarUrl ? (
-                  <img 
-                    src={avatarUrl} 
-                    alt="Profile" 
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl object-cover shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700 transform hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-2xl shadow-emerald-200 dark:shadow-emerald-900/30 border-2 border-white dark:border-gray-700">
-                    {userName.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></div>
-              </div>
-              <div className="flex flex-col justify-center ml-2">
-                <div 
-                  onClick={cycleMantra}
-                  className="cursor-pointer group select-none"
-                >
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1.5 transition-colors group-hover:text-gray-600 dark:group-hover:text-gray-300">
-                    {mantras[mantraIndex].icon}
-                    STATUS
-                    {isDev && (
-                      <span className="ml-1 flex items-center gap-0.5 px-1.5 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-[9px] rounded-full border border-violet-200 dark:border-violet-800 font-bold">
-                        DEV
-                      </span>
-                    )}
-                  </span>
-                  <div className="text-base sm:text-xl font-black text-gray-900 dark:text-white bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 group-hover:from-violet-600 group-hover:to-indigo-600 dark:group-hover:from-violet-400 dark:group-hover:to-indigo-400 transition-all duration-300">
-                    {mantras[mantraIndex].text}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-1 sm:gap-2">
-              <button 
-                onClick={toggleTheme}
-                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800 dark:hover:text-amber-400 rounded-xl transition-all duration-300"
-                title={theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
-              >
-                {theme === 'dark' ? <Sun size={20} className="sm:w-6 sm:h-6" /> : <Moon size={20} className="sm:w-6 sm:h-6" />}
-              </button>
-
-              {isDev && (
-                <Link 
-                  to="/admin"
-                  className="p-1.5 sm:p-2 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-xl transition-all duration-300 group"
-                  title="Admin Panel"
-                >
-                  <ShieldCheck size={20} className="sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
-                </Link>
-              )}
-
-              <button 
-                onClick={openNotifications}
-                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300 relative group"
-                title="Notificaciones"
-              >
-                <Bell size={20} className={`sm:w-6 sm:h-6 ${notifications.length > 0 ? "animate-swing" : ""}`} />
-                {notifications.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                  </span>
-                )}
-              </button>
-
-
-              <button 
-                onClick={openSettings}
-                className="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-300"
-                title="Configuración"
-              >
-                <Settings size={20} className="sm:w-6 sm:h-6" />
-              </button>
-
-              <button 
-                onClick={signOut}
-                className="group flex items-center gap-2 px-2 sm:px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800 transition-all duration-300 font-medium"
-              >
-                <span className="hidden md:inline text-sm">Cerrar Sesión</span>
-                <LogOut size={18} className="sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+      {/* Main Content - Adjusted for Top Oval */}
+      <main className="pt-32 sm:pt-40 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
         <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
           <div className="dashboard-control">
             <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2 sm:mb-3 text-center sm:text-left">
@@ -1106,75 +985,58 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Modern Modal */}
+      {/* Modern Modal - Simple & Clean */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 [perspective:1000px]">
           <div 
             ref={overlayRef}
-            className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-black/40 dark:bg-black/80 backdrop-blur-sm transition-opacity animate-fade-in"
             onClick={closeModal}
           ></div>
           <div 
             ref={modalRef}
-            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-md p-6 sm:p-8 relative z-10 border border-white/20 dark:border-gray-800"
+            className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-sm p-6 relative z-10 border border-gray-100 dark:border-gray-800 animate-modal-spring overflow-hidden"
           >
-            <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full transition-colors">
-                <Plus size={24} className="rotate-45" />
+            <div className="absolute top-4 right-4 z-20">
+              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all duration-200">
+                <Plus size={20} className="rotate-45" />
               </button>
             </div>
 
-            <div className="mb-6 sm:mb-8">
-              <span className="inline-block px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase mb-3 sm:mb-4 border border-emerald-200 dark:border-emerald-800">
-                {editingTask ? 'Editar Actividad' : 'Nueva Entrada'}
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                {editingTask ? 'Modificar Tarea' : 'Crear Tarea'}
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+                {editingTask ? 'Editar Tarea' : 'Nueva Tarea'}
               </h3>
-              <p className="text-sm sm:text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
-                {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: es })}
-              </p>
             </div>
 
-            <form onSubmit={handleAddTask} className="space-y-4 sm:space-y-6">
-              <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Materia / Asignatura</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <BookOpen className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. Matemáticas Avanzadas"
-                    className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 text-sm sm:text-base"
-                    value={newTask.subject}
-                    onChange={(e) => setNewTask({ ...newTask, subject: e.target.value })}
-                  />
-                </div>
+            <form onSubmit={handleAddTask} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-1">Asignatura</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Matemáticas"
+                  className="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-medium text-sm"
+                  value={newTask.subject}
+                  onChange={(e) => setNewTask({ ...newTask, subject: e.target.value })}
+                />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Hora de Entrega</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Clock className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
-                    </div>
-                    <input
-                      type="time"
-                      required
-                      className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium text-sm sm:text-base"
-                      value={newTask.due_time}
-                      onChange={(e) => setNewTask({ ...newTask, due_time: e.target.value })}
-                    />
-                  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-1">Hora</label>
+                  <input
+                    type="time"
+                    required
+                    className="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-medium text-sm"
+                    value={newTask.due_time}
+                    onChange={(e) => setNewTask({ ...newTask, due_time: e.target.value })}
+                  />
                 </div>
 
                 {editingTask && (
-                  <div className="space-y-2">
-                    <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Estado</label>
+                   <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-1">Estado</label>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1182,20 +1044,20 @@ export default function Dashboard() {
                         handleToggleComplete(e as any, editingTask);
                         closeModal();
                       }}
-                      className={`flex items-center gap-3 w-full px-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 font-bold text-sm sm:text-base ${
+                      className={`flex items-center justify-center gap-2 w-full px-4 py-3 rounded-2xl border transition-all duration-200 font-bold text-sm ${
                         editingTask.is_completed 
                           ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400' 
-                          : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400'
+                          : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     >
                       {editingTask.is_completed ? (
                         <>
-                          <CheckCircle2 size={20} className="text-emerald-500" />
-                          <span>Completada</span>
+                          <CheckCircle2 size={16} />
+                          <span>Listo</span>
                         </>
                       ) : (
                         <>
-                          <Circle size={20} />
+                          <Circle size={16} />
                           <span>Pendiente</span>
                         </>
                       )}
@@ -1204,79 +1066,71 @@ export default function Dashboard() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Descripción</label>
-                <div className="relative group">
-                  <div className="absolute top-3.5 left-4 pointer-events-none">
-                    <FileText className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
-                  </div>
-                  <textarea
-                    required
-                    placeholder="¿Qué necesitas realizar?"
-                    rows={3}
-                    className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl sm:rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-0 transition-all outline-none font-medium placeholder:text-gray-400 resize-none text-sm sm:text-base"
-                    value={newTask.description}
-                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                  />
-                </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-1">Detalles</label>
+                <textarea
+                  required
+                  placeholder="Descripción breve..."
+                  rows={2}
+                  className="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-medium resize-none text-sm"
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
-                {editingTask && (
+              <div className="flex gap-3 pt-2">
+                 {editingTask && (
                   <button
                     type="button"
                     onClick={handleDeleteTask}
-                    className="flex items-center justify-center gap-2 px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-200 text-sm sm:text-base border border-red-100 dark:border-red-900/30"
+                    className="flex items-center justify-center w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/10 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
                   >
-                    <Trash2 size={18} />
-                    <span>Eliminar</span>
+                    <Trash2 size={20} />
                   </button>
                 )}
-                <div className="flex flex-1 gap-3 sm:gap-4">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 text-sm sm:text-base"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gray-900 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-gray-200 dark:shadow-emerald-900/20 hover:shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm sm:text-base"
-                  >
-                    {loading ? (
-                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <span>{editingTask ? 'Actualizar' : 'Guardar'}</span>
-                        <ChevronRight size={18} />
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-[2] px-4 py-3 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-lg shadow-black/20 dark:shadow-white/20"
+                >
+                  {loading ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>{editingTask ? 'Guardar' : 'Crear'}</span>
+                      <ChevronRight size={16} />
+                    </>
+                  )}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Liquid Glass Navigation Oval */}
+      {/* Liquid Glass Navigation Oval - Top Position */}
       <div 
-        className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isNavExpanded 
-            ? 'w-[90%] sm:w-[600px] px-8 py-4 rounded-[2rem] bg-white/40 dark:bg-black/40' 
-            : 'w-auto px-6 py-3 rounded-full bg-white/20 dark:bg-black/20'
-        } backdrop-blur-xl border border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] flex items-center overflow-hidden`}
+            ? 'w-[95%] sm:w-[880px] px-8 py-4 rounded-[2.5rem] bg-gradient-to-b from-white/80 to-white/40 dark:from-black/80 dark:to-black/40' 
+            : 'w-auto px-10 py-4 rounded-full bg-gradient-to-b from-white/60 to-white/30 dark:from-black/60 dark:to-black/30'
+        } backdrop-blur-3xl border-t border-l border-r border-white/60 border-b border-white/20 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-white/50 ring-inset flex items-center overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-50 before:pointer-events-none`}
       >
-        <div className={`flex items-center w-full ${isNavExpanded ? 'justify-between' : 'gap-6'}`}>
+        <div className={`flex items-center w-full ${isNavExpanded ? 'justify-between' : 'gap-3 sm:gap-5'}`}>
            {/* Agenda */}
            <button 
              onClick={() => setActiveTab('agenda')}
              className={`flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${activeTab === 'agenda' ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
              title="Agenda"
            >
-             <Layout size={24} />
+             <Layout size={20} className="sm:w-6 sm:h-6" />
              <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
                Agenda
              </span>
@@ -1288,7 +1142,7 @@ export default function Dashboard() {
              className={`flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${activeTab === 'memberships' ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
              title="Membresías"
            >
-             <CreditCard size={24} />
+             <CreditCard size={20} className="sm:w-6 sm:h-6" />
              <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
                Membresías
              </span>
@@ -1303,7 +1157,7 @@ export default function Dashboard() {
              className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-emerald-600 dark:hover:text-emerald-400"
              title="Citas"
            >
-             <CalendarCheck size={24} />
+             <CalendarCheck size={20} className="sm:w-6 sm:h-6" />
              <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
                Citas
              </span>
@@ -1315,11 +1169,48 @@ export default function Dashboard() {
              className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-teal-500"
              title="Sender AI"
            >
-             <Bot size={24} />
+             <Bot size={20} className="sm:w-6 sm:h-6" />
              <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
                Sender AI
              </span>
            </button>
+
+           <div className="h-6 w-px bg-gray-400/30 dark:bg-gray-600/30 mx-1"></div>
+
+           {/* Theme */}
+           <button 
+             onClick={toggleTheme}
+             className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-amber-500"
+             title={theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+           >
+             {theme === 'dark' ? <Sun size={20} className="sm:w-6 sm:h-6" /> : <Moon size={20} className="sm:w-6 sm:h-6" />}
+           </button>
+
+           {/* Notificaciones */}
+           <button 
+             onClick={openNotifications}
+             className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-blue-500 relative"
+             title="Notificaciones"
+           >
+             <Bell size={20} className={`sm:w-6 sm:h-6 ${notifications.length > 0 ? "animate-swing" : ""}`} />
+             {notifications.length > 0 && (
+               <span className="absolute top-0 right-0 flex h-2 w-2">
+                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+               </span>
+             )}
+           </button>
+
+           {/* Admin (Conditional) */}
+           {isDev && (
+             <Link 
+               to="/admin"
+               className="flex items-center justify-center gap-2 text-violet-600 dark:text-violet-400 transition-colors hover:text-violet-500"
+               title="Admin Panel"
+             >
+               <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
+             </Link>
+           )}
 
            {/* Configuración */}
            <button 
@@ -1327,10 +1218,16 @@ export default function Dashboard() {
              className="flex items-center justify-center gap-2 text-gray-700 dark:text-white transition-colors hover:text-gray-900 dark:hover:text-gray-200"
              title="Configuración"
            >
-             <Settings size={24} />
-             <span className={`font-bold text-sm whitespace-nowrap overflow-hidden transition-all duration-500 ${isNavExpanded ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
-               Configuración
-             </span>
+             <Settings size={20} className="sm:w-6 sm:h-6" />
+           </button>
+
+           {/* Cerrar Sesión */}
+           <button 
+             onClick={signOut}
+             className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400 transition-colors hover:text-red-500"
+             title="Cerrar Sesión"
+           >
+             <LogOut size={20} className="sm:w-6 sm:h-6" />
            </button>
         </div>
       </div>

@@ -1,1 +1,1 @@
-Fix: Build error by removing unused variables & Refactor: Extracted Memberships section
+feat: Add password recovery, fix white screen, and add email template

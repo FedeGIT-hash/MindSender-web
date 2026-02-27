@@ -14,6 +14,8 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     // Animate form entrance
@@ -67,6 +69,25 @@ export default function Login() {
         errorMessage = 'Correo o contraseña incorrectos.';
       }
       setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+      setResetSent(true);
+    } catch (err: any) {
+      setError(err.message || 'Error al enviar el correo de recuperación');
     } finally {
       setLoading(false);
     }
@@ -138,61 +159,110 @@ export default function Login() {
           className="w-full max-w-md"
         >
           <div className="mb-8 text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Bienvenido de nuevo</h2>
-            <p className="text-gray-500 dark:text-gray-400">Ingresa tus credenciales para acceder</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              {isResetMode ? 'Recuperar Contraseña' : 'Bienvenido de nuevo'}
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400">
+              {isResetMode 
+                ? 'Ingresa tu correo para recibir las instrucciones' 
+                : 'Ingresa tus credenciales para acceder'}
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm text-center">
-                {error}
+          {resetSent ? (
+            <div className="text-center space-y-4">
+              <div className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-xl text-sm">
+                Hemos enviado un enlace de recuperación a <strong>{email}</strong>. Por favor revisa tu bandeja de entrada.
               </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Correo Electrónico</label>
-              <div className="relative group">
-                <Mail className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
-                <input
-                  type="email"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
-                  placeholder="nombre@ejemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
+              <button
+                onClick={() => {
+                  setResetSent(false);
+                  setIsResetMode(false);
+                }}
+                className="text-green-600 dark:text-green-400 font-semibold hover:underline"
+              >
+                Volver al inicio de sesión
+              </button>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contraseña</label>
-              <div className="relative group">
-                <Lock className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
-                <input
-                  type="password"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+          ) : (
+            <form onSubmit={isResetMode ? handleResetPassword : handleSubmit} className="space-y-6">
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm text-center">
+                  {error}
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Correo Electrónico</label>
+                <div className="relative group">
+                  <Mail className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
+                  <input
+                    type="email"
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
+                    placeholder="nombre@ejemplo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-green-600 text-white py-3.5 rounded-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] shadow-lg shadow-green-200 dark:shadow-none disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Iniciando...' : 'Iniciar Sesión'}
-            </button>
-          </form>
+              {!isResetMode && (
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsResetMode(true)}
+                      className="text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold hover:underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 group-focus-within:text-green-500 transition-colors" size={20} />
+                    <input
+                      type="password"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 dark:text-white"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
 
-          <p className="mt-8 text-center text-gray-600 dark:text-gray-400">
-            ¿No tienes cuenta?{' '}
-            <Link to="/register" className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold hover:underline">
-              Regístrate aquí
-            </Link>
-          </p>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-green-600 text-white py-3.5 rounded-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] shadow-lg shadow-green-200 dark:shadow-none disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {loading 
+                  ? (isResetMode ? 'Enviando...' : 'Iniciando...') 
+                  : (isResetMode ? 'Enviar enlace de recuperación' : 'Iniciar Sesión')}
+              </button>
+
+              {isResetMode && (
+                <button
+                  type="button"
+                  onClick={() => setIsResetMode(false)}
+                  className="w-full text-gray-500 dark:text-gray-400 font-semibold hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+              )}
+            </form>
+          )}
+
+          {!isResetMode && (
+            <p className="mt-8 text-center text-gray-600 dark:text-gray-400">
+              ¿No tienes cuenta?{' '}
+              <Link to="/register" className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold hover:underline">
+                Regístrate aquí
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>
